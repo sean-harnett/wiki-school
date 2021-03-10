@@ -1,2 +1,3 @@
 # wiki-school
-<p>Simple Application to organize my university course work and classes</p>
+Spring Boot Application to manage school notes, and resources.
+
