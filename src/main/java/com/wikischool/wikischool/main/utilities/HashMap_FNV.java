@@ -7,74 +7,70 @@ import java.util.Set;
 import java.util.UUID;
 
 // Maybe write a find node method instead of repeating myself..?
-public class HashMap_FNV { // 32 bit integer hash
+public class HashMap_FNV<Key, Value> { // 32 bit integer hash
 
-    private final int SIZE;
+    private final int capacity;
     private final int MAP_EMPTY = 0;
     private final int FNV_32_INIT = 0x811c9dc5;
     private final int FNV_32_PRIME = 0x01000193;
-    private final Bucket[] map;
+    private Bucket<Key, Value> map[];
     private int element_count;
-    private HashSet<UUID> keySet; //Contains the keys -> perhaps implement my own..?
-    private Bucket initial_target_parent;
+    private HashSet<Key> keySet; //Contains the keys -> perhaps implement my own..?
+    private Bucket<Key, Value> initial_target_parent;
 
     public HashMap_FNV(int given_capacity) {
         this.element_count = 0;
-        this.SIZE = given_capacity;
-        this.map = new Bucket[SIZE];
+        this.capacity = given_capacity;
+        this.map = new Bucket[given_capacity];
         this.initial_target_parent = null;
-        Arrays.fill(map, new Bucket(null, null, null, null)); //list of heads to buckets
-        this.keySet = new HashSet<UUID>(given_capacity);
+        Arrays.fill(map, new Bucket<Key, Value>(null, null, null, null)); //list of heads to buckets
+        this.keySet = new HashSet<Key>(given_capacity);
     }
 
-    public void put(UUID key, Object value) {
+    public void put(Key key, Value value) {
         if (isMapFull()) {
             return;
-        } // map is full
-        Bucket target = getTarget(key);
-        //above two lines can be extracted
+        }
+        Bucket<Key, Value> target = getTarget(key);
         if (target == null) {
-            target = new Bucket(key, value, null, this.initial_target_parent);
-            this.initial_target_parent.next = target;
-            this.element_count++; //increment elements
-            this.keySet.add(key);
+
+            target = new Bucket<>(key, value, null, this.initial_target_parent);
+            initial_target_parent.next = target;
+            element_count++;
+            keySet.add(key);
             return;
         }
-
         while (target.key != key) {
             if (target.next == null) {
-                target.next = new Bucket(key, value, null, target);
-                this.element_count++; //increment elements
-                this.keySet.add(key);
+                target.next = new Bucket<Key, Value>(key, value, null, target);
+                element_count++;
+                keySet.add(key);
                 return;
             }
             target = target.next;
         }
-        target.value = value; //Update
+        target.value = value; // Or update value
     }
 
-    public Object get(UUID key) {
+    public Value get(Key key) {
         if (isMapEmpty()) {
             return null;
         }
-        Bucket target = getTarget(key);
-        if (target == null) {
-            return null; // maybe something else? -> or return custom boolean obj
-        }
+        Bucket<Key, Value> target = getTarget(key);
         while (target != null && target.key != key) {
             target = target.next;
         }
         if (target == null) {
             return null;
         }
-        return target.value; // then cast to something
+        return target.value;
     }
 
-    public void remove(UUID key) {
+    public void remove(Key key) {
         if (isMapEmpty()) {
             return;
         }
-        Bucket target = getTarget(key);
+        Bucket<Key, Value> target = getTarget(key);
 
         if (target != null) {
             while (target.key != key) {
@@ -93,7 +89,7 @@ public class HashMap_FNV { // 32 bit integer hash
     }
 
     public boolean isMapFull() {
-        if (this.element_count == SIZE) {
+        if (this.element_count == capacity) {
             return true;
         }
         return false;
@@ -110,13 +106,11 @@ public class HashMap_FNV { // 32 bit integer hash
         return keySet.contains(key);
     }
 
-    public Set<UUID> keySet() {
-
+    public Set<Key> keySet() {
         return this.keySet;
-
     }
 
-    private Bucket getTarget(UUID key) {
+    private Bucket getTarget(Key key) {
         int hash_key = hash(key.hashCode());
         this.initial_target_parent = map[hash_key];
         return this.initial_target_parent.next;
@@ -141,19 +135,19 @@ public class HashMap_FNV { // 32 bit integer hash
         byte[] to_hash = buffer.array();
 
         int key = hashFNV32(to_hash);
-        if (key < 0) {
+        if (key < 0) { // if hash is negative : invert
             key = ~key;
         }
-        return (key % SIZE); //The new hash table key
+        return (key % capacity); //The new hash table key
     }
 
-    class Bucket {
-        public UUID key;
-        public Object value;
-        public Bucket next;
+    class Bucket<K, V> {
+        public K key;
+        public V value;
+        public Bucket<K, V> next;
         public Bucket prev;
 
-        public Bucket(UUID key, Object value, Bucket next, Bucket prev) {
+        public Bucket(K key, V value, Bucket next, Bucket prev) {
             this.key = key;
             this.value = value;
             this.next = next;

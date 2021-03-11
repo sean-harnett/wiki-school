@@ -18,7 +18,7 @@ public class StudentService implements Standard_Service_Operations<Student, Stud
     private final LRUCache StudentCache = new LRUCache(SizeConstants.DEFAULT_CACHE_LENGTH);
 
     // hard memory, that will switch to JDBC or similar:
-    private final HashMap_FNV testMemory = new HashMap_FNV(SizeConstants.DEFAULT_MAP_LENGTH); // Create hashMap interface.
+    private final HashMap_FNV<UUID, Student> testMemory = new HashMap_FNV<UUID, Student>(SizeConstants.DEFAULT_MAP_LENGTH); // Create hashMap interface.
 
     //Constructor(s):
     public StudentService() {
