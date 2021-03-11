@@ -3,9 +3,8 @@ package com.wikischool.wikischool.main.ConnectionObjects;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
-public class JdbcConnection implements PostgresConnection {
+public class JdbcConnection implements PostgresqlConnection {
 
         private Connection connection;
        // private DriverManager driverManager;
@@ -13,14 +12,9 @@ public class JdbcConnection implements PostgresConnection {
         private String password;
         private String dataBase;
 
-
-
         public void getConnection(){
 
-                String connectionUrl = "jdbc:postgresql";
-                Properties props = new Properties();
-
-
+                String connectionUrl = "jdbc:postgresql"; //temp placeholder, while I work on ConnectionProperties object/file
 
                 try(Connection connection1 = DriverManager.getConnection(connectionUrl, userName, password)){
 
