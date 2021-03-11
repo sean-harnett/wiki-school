@@ -6,21 +6,25 @@ import java.sql.SQLException;
 
 public class JdbcConnection implements PostgresqlConnection {
 
-        private Connection connection;
-       // private DriverManager driverManager;
-        private String userName;
-        private String password;
-        private String dataBase;
+    ConnectionProperties properties;
+    private Connection connection;
+    private String userName;
+    private String password;
+    private String dataBase;
 
-        public void getConnection(){
+    public JdbcConnection() {
+        this.properties = new ConnectionProperties("src/main/java/com/wikischool/wikischool/databaseConnectionPropertiesFile.properties");
+    }
 
-                String connectionUrl = "jdbc:postgresql"; //temp placeholder, while I work on ConnectionProperties object/file
+    public void getConnection() {
 
-                try(Connection connection1 = DriverManager.getConnection(connectionUrl, userName, password)){
+        String connectionUrl = "jdbc:postgresql"; //temp placeholder, while I work on ConnectionProperties object/file
 
-                }catch(SQLException e){
-                        System.out.println(e.getStackTrace());
-                }
+        try (Connection connection1 = DriverManager.getConnection(connectionUrl, userName, password)) {
+
+        } catch (SQLException e) {
+            System.out.println(e.getStackTrace());
         }
+    }
 
 }

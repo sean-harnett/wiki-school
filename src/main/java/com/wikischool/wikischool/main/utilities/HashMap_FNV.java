@@ -6,17 +6,20 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-// Maybe write a find node method instead of repeating myself..?
 public class HashMap_FNV<Key, Value> { // 32 bit integer hash
+
+    // The base hash value to start with
+    private final int FNV_32_OFFSET = 0x811c9dc5; // Initial FNV 32 bit hash offset
+    // Prime Number provides better hash distribution
+    private final int FNV_32_PRIME = 0x01000193; //Standard FNV_Prime number for 32 bit hash
+
 
     private final int capacity;
     private final int MAP_EMPTY = 0;
-    private final int FNV_32_INIT = 0x811c9dc5;
-    private final int FNV_32_PRIME = 0x01000193;
-    private Bucket<Key, Value> map[];
     private int element_count;
-    private HashSet<Key> keySet; //Contains the keys -> perhaps implement my own..?
-    private Bucket<Key, Value> initial_target_parent;
+    private HashSet<Key> keySet; //Contains map keys
+    private Bucket<Key, Value> map[];
+    private Bucket<Key, Value> initial_target_parent; // actual map entry, root of list where target node exists
 
     public HashMap_FNV(int given_capacity) {
         this.element_count = 0;
@@ -118,7 +121,7 @@ public class HashMap_FNV<Key, Value> { // 32 bit integer hash
 
     private int hashFNV32(byte[] k) {
 
-        int key = FNV_32_INIT;
+        int key = FNV_32_OFFSET;
         final int length = k.length;
 
         for (int ix = 0; ix < length; ix++) {

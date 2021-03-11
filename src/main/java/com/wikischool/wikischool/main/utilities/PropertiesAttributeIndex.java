@@ -1,9 +1,9 @@
 package com.wikischool.wikischool.main.utilities;
 
 public enum PropertiesAttributeIndex {
-    USERNAME("username"),
-    PASSWORD("password"),
-    CONNECTION_URL("connection_url");
+    USERNAME("database.username"),
+    PASSWORD("database.password"),
+    CONNECTION_URL("database.connection_url");
 
     private final String propertyValue;
     PropertiesAttributeIndex(String prop) {
