@@ -4,11 +4,11 @@ public class Note { //Will store notes about courses
 
     private final String title;
     private final String category;
-    private final String description;
+    private final String textBody;
 
-    public Note(String title, String category, String description) {
+    public Note(String title, String category, String noteBody) {
         this.title = title;
         this.category = category;
-        this.description = description;
+        this.textBody = noteBody;
     }
 }

@@ -1,9 +1,51 @@
 package com.wikischool.wikischool.main.Models;
 
-public class Note {
-    private String title;
-    private String header;
-    private String description;
-    private Topic topic;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.util.List;
 
+public class Note {
+    // may need UUID for storing in table
+    private String title;
+    private String textBody;
+    private LocalDate timeLastUpdated; //simple date storage.
+    private List<String> internetResources; // Will change to URL
+
+
+    public Note(String title, String textBody, LocalDate timeLastUpdated, List<String> internetResources) {
+        this.title = title;
+        this.textBody = textBody;
+        this.timeLastUpdated = timeLastUpdated;
+        this.internetResources = internetResources;
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTextBody() {
+        return textBody;
+    }
+
+    public void setTextBody(String textBody) {
+        this.textBody = textBody;
+    }
+
+    public LocalDate getTimeLastUpdated() { return timeLastUpdated; }
+
+    public void setTimeLastUpdated(LocalDate timeLastUpdated) {
+        this.timeLastUpdated = timeLastUpdated;
+    }
+
+    public List<String> getInternetResources() {
+        return internetResources;
+    }
+
+    public void setInternetResources(List<String> internetResources) {
+        this.internetResources = internetResources;
+    }
+}
