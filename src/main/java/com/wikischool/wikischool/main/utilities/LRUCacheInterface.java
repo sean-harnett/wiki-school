@@ -2,6 +2,10 @@ package com.wikischool.wikischool.main.utilities;
 
 import java.util.UUID;
 
+/**
+ * interface to specify the LRU cache base functionality.
+ * @author sean-harnett
+ */
 public interface LRUCacheInterface {
 
     public Object get(UUID key);

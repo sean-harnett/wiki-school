@@ -1,9 +1,14 @@
 package com.wikischool.wikischool.main.Models;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Class to store notes that correspond to courses in the application.
+ * Also stores a list of URLs to online/external resources relevant to the note.
+ * Contains only Constructor(1) getters and setters.
+ * @author sean-harnett
+ */
 public class Note {
     // may need UUID for storing in table
     private String title;

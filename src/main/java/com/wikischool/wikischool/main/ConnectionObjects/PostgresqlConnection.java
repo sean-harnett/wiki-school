@@ -1,3 +1,6 @@
 package com.wikischool.wikischool.main.ConnectionObjects;
 
-public interface PostgresqlConnection { /* Marker Interface tells what type of conneciton*/ }
+/**
+ * Market interface to explicitly specify what type of database other classes work with
+ */
+public interface PostgresqlConnection { }

@@ -2,16 +2,27 @@ package com.wikischool.wikischool.main.utilities;
 
 import java.util.UUID;
 
-public class LRUCache implements LRUCacheInterface { //can change to a linked hashmap, would remove most of this code.
+/**
+ * Implementation of a Least Recently Used (LRU) cache.
+ * The LRU cache determines what entries can be deleted based on how relevant they are.
+ * Relevance is determined by how recently an entry was last used. Leaving the less relevant to be replaced.
+ * Relevance is implicit in this implementation based on an entries position in a linked list.
+ *
+ * @author sean-harnett
+ */
+public class LRUCache implements LRUCacheInterface {
 
-    // double pointers (keep empty):
+    // References to the list, they themselves have no values
     private final LRUNode head = new LRUNode();
     private final LRUNode tail = new LRUNode();
     private HashMap_FNV hash_map;
     private int capacity;
     private int elements;
 
-
+    /**
+     * Constructor to initialize to a specific capacity
+     * @param given_capacity int
+     */
     public LRUCache(int given_capacity) {
         hash_map = new HashMap_FNV(given_capacity);
         capacity = given_capacity;
@@ -19,6 +30,11 @@ public class LRUCache implements LRUCacheInterface { //can change to a linked ha
         head.next = tail;
         tail.previous = head;
     }
+
+    /**
+     * add the node to the front of the list, increasing it's relevance
+     * @param target_node node to move in hte list.
+     */
 
     private void add_to_front(LRUNode target_node) { // add node to the front of the list
         LRUNode temp;
@@ -31,10 +47,20 @@ public class LRUCache implements LRUCacheInterface { //can change to a linked ha
         target_node.previous = head;
     }
 
+    /**
+     * Remove a node from the list, not necessarily the cache.
+     * @param target_node The node to remove
+     */
     private void remove(LRUNode target_node) { //remove node from list
         target_node.previous.next = target_node.next;
         target_node.next.previous = target_node.previous;
     }
+
+    /**
+     * Get an entry from the LRU cache.
+     * @param key Identifier of the entry
+     * @return Object corresponding to key
+     */
 
     @Override
     public Object get(UUID key) { //Get from the cache
@@ -51,6 +77,13 @@ public class LRUCache implements LRUCacheInterface { //can change to a linked ha
 
         return target_node.getValue(); //Cast to target type
     }
+
+    /**
+     * Add an entity to the cache.
+     * If the cache is at capacity, replace the least relevant.
+     * @param key Identifier for the object
+     * @param value Object to store in the cache
+     */
 
     @Override
     public void put(UUID key, Object value) {
@@ -77,6 +110,10 @@ public class LRUCache implements LRUCacheInterface { //can change to a linked ha
         elements++;
     }
 
+    /**
+     * Permanently delete an entry from the cache
+     * @param key Identifier with a corresponding Object stored in the cache
+     */
     public void cacheDelete(UUID key){ //Delete entry from cache
         LRUNode target_node = (LRUNode)hash_map.get(key);
         if(target_node == null){
@@ -86,9 +123,12 @@ public class LRUCache implements LRUCacheInterface { //can change to a linked ha
         remove(target_node);
     }
 
-    public boolean checkCache(UUID id ){ //Check if something in the cache
-       return (this.hash_map.containsKey(id));
+    /**
+     * Check if there is a mapping for a key in the cache
+     * @param key Identifier with a corresponding Object stored in the cache
+     * @return boolean whether the key exists in the hashmap or not.
+     */
+    public boolean checkCache(UUID key ){ //Check if something in the cache
+       return (this.hash_map.containsKey(key));
     }
-    public HashMap_FNV getMap(){return this.hash_map;}
-
 }

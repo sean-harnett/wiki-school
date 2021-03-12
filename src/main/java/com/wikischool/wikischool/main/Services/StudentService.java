@@ -13,19 +13,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class StudentService implements Standard_Service_Operations<Student, StudentAttributeIndex> { // No Getters or Setters
+/**
+ * Class to work with student objects and their functionality
+ * @author sean-harnett
+ */
+public class StudentService implements Standard_Service_Operations<Student, StudentAttributeIndex> {
 
     private final LRUCache StudentCache = new LRUCache(SizeConstants.DEFAULT_CACHE_LENGTH);
 
     // hard memory, that will switch to JDBC or similar:
-    private final HashMap_FNV<UUID, Student> testMemory = new HashMap_FNV<UUID, Student>(SizeConstants.DEFAULT_MAP_LENGTH); // Create hashMap interface.
+    private final HashMap_FNV<UUID, Student> testMemory = new HashMap_FNV<UUID, Student>(SizeConstants.DEFAULT_MAP_LENGTH);
 
     //Constructor(s):
+
+    /**
+     * Empty Constructor.
+     */
     public StudentService() {
     }
 
     //Main Methods:
 
+    /**
+     * Method to obtain a list of courses the student attends.
+     * @param studentId UUID to identify a specific student
+     * @return List of courses the student contains
+     */
     public List<Course> getStudentCoursesById(UUID studentId) {
         if (!this.testMemory.containsKey(studentId)) {
             return null;
@@ -35,16 +48,28 @@ public class StudentService implements Standard_Service_Operations<Student, Stud
         return studentCourses;
     }
 
-
+    /**
+     * Find a specific student through their ID, and delete them.
+     * @param id UUID to identify a specific student
+     * @return boolean whether the student was deleted.
+     */
     public boolean deleteById(UUID id) {
         if (!this.testMemory.containsKey(id)) {
             return false;
         }
         this.testMemory.remove(id);
-        this.deleteFromCache(id);
+        this.StudentCache.cacheDelete(id);
         return true;
     }
 
+    /**
+     * Find a student and update them, with new qualities.
+     * For example: change their name.
+     * The implementation and type of parameters are subject to change.
+     * @param id UUID to identify a specific student
+     * @param updatedAttributes This is a student object to compare and change the attributes that are different
+     * @return boolean - if attributes were changed
+     */
     public boolean updateById(UUID id, Student updatedAttributes) {
         // Implement when connected to database.
 
@@ -53,10 +78,21 @@ public class StudentService implements Standard_Service_Operations<Student, Stud
 
     //Interface Implementations:
 
+    /**
+     * Insert a student into a database.
+     * @param entity Student to insert
+     * @return boolean - whether the student was inserted.
+     */
     @Override
     public boolean InsertIntoDataBase(Student entity) { //Implement after jdbc driver written
         return false;
     }
+
+    /**
+     * Create a new student based off of attribute mappings.
+     * @param entityAttributes Map using [StudentAttributeIndex enum, Object] [key,value] pairs.
+     * @return Student
+     */
 
     @Override
     public Student create(Map<StudentAttributeIndex, Object> entityAttributes) {
@@ -68,12 +104,21 @@ public class StudentService implements Standard_Service_Operations<Student, Stud
         return createdStudent;
     }
 
+    /**
+     * Create and insert a student into a database.
+     * @param entityAttributes Map using [StudentAttributeIndex enum, Object] [key,value] pairs.
+     * @return boolean - whether the operations were successful.
+     */
     @Override
     public boolean createAndInsertEntity(Map<StudentAttributeIndex, Object> entityAttributes) {
         return false;
     }
 
-
+    /**
+     * Method that returns all students.
+     * Its specific implementation will change.
+     * @return - List of Students
+     */
     @Override
     public List<Student> retrieveAll() { // reimplement with jdbc connection
 
@@ -89,16 +134,15 @@ public class StudentService implements Standard_Service_Operations<Student, Stud
         return students;
     }
 
-    //Cache helper: -> are these completely pointless..?
-    private void deleteFromCache(UUID studentId) {
-        this.StudentCache.cacheDelete(studentId);
-    }
-
+    /**
+     * Helper function to obtain an object of student type from the cache.
+     * This method will no longer be needed when the LRU cache changes to use generics.
+     * @param studentId Identifier to find specific student in cache.
+     * @return Student object
+     */
     private Student retrieveFromCache(UUID studentId) {
         return (Student) this.StudentCache.get(studentId);
     }
 
-    private void insertIntoCache(UUID studentId, Student studentToInsert) {
-        this.StudentCache.put(studentId, studentToInsert);
-    }
+
 }

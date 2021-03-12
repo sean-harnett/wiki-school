@@ -1,5 +1,9 @@
 package com.wikischool.wikischool.main.utilities;
 
+/**
+ * This Enum corresponds to names of properties from a properties file.
+ * @author sean-harnett
+ */
 public enum PropertiesAttributeIndex {
     USERNAME("database.username"),
     PASSWORD("database.password"),

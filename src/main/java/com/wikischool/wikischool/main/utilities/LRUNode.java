@@ -2,6 +2,11 @@ package com.wikischool.wikischool.main.utilities;
 
 import java.util.UUID;
 
+/**
+ * Node used in the LRU cache implementation.
+ * The only methods are getters and setters for class members.
+ * @author sean-harnett
+ */
 public class LRUNode {
 
 
