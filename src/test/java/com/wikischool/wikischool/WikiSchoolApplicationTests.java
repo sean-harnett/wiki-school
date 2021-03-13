@@ -11,29 +11,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+/**
+ * This class is used to perform tests on the application.
+ * @author sean-harnett
+ */
 class WikiSchoolApplicationTests {
-	@Autowired
-	private JdbcConnection jdbcTestObject;
 
-	/**
-	 * Test if the properties are read into the connection object correctly
-	 */
-	@Test
-	public void TestConnectionProperties(){
-		jdbcTestObject.setPropertiesFromFile();
-		assertThat(jdbcTestObject.getPassword()).isEqualTo("-password-"); //Test that password is stored correctly
-		assertThat(jdbcTestObject.getUserName()).isEqualTo("postgres");
-		assertThat(jdbcTestObject.getConnectionUrl()).isEqualTo("jdbc:postgresql://localhost:5432/test");
-	}
 
-	/**
-	 *  Test if the connection object works, and a connection can be established
-	 */
-	@Test
-	public void TestIfConnectionEstablished(){
-		jdbcTestObject.setPropertiesFromFile();
-		jdbcTestObject.establishConnection();
-		assertThat(jdbcTestObject.checkConnection()).isEqualTo(true);
-	}
+    @Autowired
+    private JdbcConnection jdbcTestObject;
+
+    /**
+     * Test if the properties are read into the connection object correctly
+     */
+    @Test
+    public void TestConnectionProperties() {
+        jdbcTestObject.setPropertiesFromFile();
+        assertThat(jdbcTestObject.getPassword()).isEqualTo("-password-"); //Test that password is stored correctly
+        assertThat(jdbcTestObject.getUserName()).isEqualTo("postgres");
+        assertThat(jdbcTestObject.getConnectionUrl()).isEqualTo("jdbc:postgresql://localhost:5432/test");
+    }
+
+    /**
+     * Test if the connection object works, and a connection can be established
+     */
+    @Test
+    public void TestIfConnectionEstablished() {
+        jdbcTestObject.setPropertiesFromFile();
+        jdbcTestObject.establishConnection();
+        assertThat(jdbcTestObject.checkConnection()).isEqualTo(true);
+    }
+
 
 }

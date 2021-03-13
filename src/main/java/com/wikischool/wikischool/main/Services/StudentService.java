@@ -7,6 +7,7 @@ import com.wikischool.wikischool.main.utilities.HashMap_FNV;
 import com.wikischool.wikischool.main.utilities.LRUCache;
 import com.wikischool.wikischool.main.utilities.SizeConstants;
 import com.wikischool.wikischool.main.utilities.StudentAttributeIndex;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.UUID;
  * Class to work with student objects and their functionality
  * @author sean-harnett
  */
+
+@Service
 public class StudentService implements Standard_Service_Operations<Student, StudentAttributeIndex> {
 
     private final LRUCache StudentCache = new LRUCache(SizeConstants.DEFAULT_CACHE_LENGTH);
