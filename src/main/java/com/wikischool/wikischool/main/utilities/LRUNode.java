@@ -7,15 +7,15 @@ import java.util.UUID;
  * The only methods are getters and setters for class members.
  * @author sean-harnett
  */
-public class LRUNode {
+public class LRUNode<K,V> {
 
 
     public LRUNode previous;
     public LRUNode next;
-    private UUID key;
-    private Object value;
+    private K key;
+    private V value;
 
-    public LRUNode(UUID key, Object value) {
+    public LRUNode(K key, V value) {
         this.key = key;
         this.value = value;
     }
@@ -27,11 +27,11 @@ public class LRUNode {
         value = null;
     }
 
-    public UUID getKey() {
+    public K getKey() {
         return key;
     }
 
-    public void setKey(UUID key) {
+    public void setKey(K key) {
         this.key = key;
     }
 
@@ -51,9 +51,9 @@ public class LRUNode {
         this.next = next;
     }
 
-    public Object getValue() { return value; }
+    public V getValue() { return value; }
 
-    public void setValue(Object value) {
+    public void setValue(V value) {
         this.value = value;
     }
 

@@ -1,6 +1,5 @@
 package com.wikischool.wikischool.main.utilities;
 
-import java.util.UUID;
 
 /**
  * Implementation of a Least Recently Used (LRU) cache.
@@ -8,14 +7,17 @@ import java.util.UUID;
  * Relevance is determined by how recently an entry was last used. Leaving the less relevant to be replaced.
  * Relevance is implicit in this implementation based on an entries position in a linked list.
  *
+ *
  * @author sean-harnett
  */
-public class LRUCache implements LRUCacheInterface {
 
-    // References to the list, they themselves have no values
+// TO DO: Implement generic FNV map: (This class does not work right now.)
+public class LRUCache<K, V> implements LRUCacheInterface<K,V> {
+
+    // head and tail are references to the list, they themselves have no values
     private final LRUNode head = new LRUNode();
     private final LRUNode tail = new LRUNode();
-    private HashMap_FNV hash_map;
+    private HashMap_FNV<K,LRUNode<K,V>> hash_map;
     private int capacity;
     private int elements;
 
@@ -24,7 +26,7 @@ public class LRUCache implements LRUCacheInterface {
      * @param given_capacity int
      */
     public LRUCache(int given_capacity) {
-        hash_map = new HashMap_FNV(given_capacity);
+        hash_map = new HashMap_FNV<>(given_capacity);
         capacity = given_capacity;
         elements = 0;
         head.next = tail;
@@ -63,19 +65,22 @@ public class LRUCache implements LRUCacheInterface {
      */
 
     @Override
-    public Object get(UUID key) { //Get from the cache
-        System.out.println("GET FROM CACHE");
+    public V get(K key) { //Get from the cache
+
         boolean check = hash_map.containsKey(key);
 
         if (!check) {
+
             return null; //key does not exist
         }
-        LRUNode target_node = (LRUNode)hash_map.get(key);
+
+        LRUNode<K,V> target_node = hash_map.get(key);
+
         // Reorder list to increment most recently used:
         remove(target_node);
         add_to_front(target_node);
 
-        return target_node.getValue(); //Cast to target type
+        return target_node.getValue();
     }
 
     /**
@@ -86,36 +91,40 @@ public class LRUCache implements LRUCacheInterface {
      */
 
     @Override
-    public void put(UUID key, Object value) {
-        LRUNode update_node = (LRUNode)hash_map.get(key);
-        System.out.println("PUT INTO CACHE");
+    public void put(K key, V value) {
+        LRUNode<K,V> update_node = (LRUNode)hash_map.get(key);
+
         if (update_node != null) { //Update the node
             remove(update_node);
             add_to_front(update_node);
             update_node.setValue(value);
+            System.out.println("NODE UPDATED");
             return;
         }
 
         if (elements == capacity) { //Set the new tail and remove Node from hash
-            LRUNode temp;
+            LRUNode<K,V> temp;
             temp = tail.previous;
             remove(temp);
-            hash_map.remove(temp.getKey()); // remove the Node by UUID key
+
+            hash_map.remove(temp.getKey()); // remove the Node by key
             elements--;
+
         }
         //Add to front of list, and add to hash:
-        LRUNode new_node = new LRUNode(key, value);
+        LRUNode new_node = new LRUNode<K,V>(key, value);
         add_to_front(new_node);
         hash_map.put(key, new_node);
         elements++;
+
     }
 
     /**
      * Permanently delete an entry from the cache
      * @param key Identifier with a corresponding Object stored in the cache
      */
-    public void cacheDelete(UUID key){ //Delete entry from cache
-        LRUNode target_node = (LRUNode)hash_map.get(key);
+    public void cacheDelete(K key){ //Delete entry from cache
+        LRUNode<K, V> target_node = hash_map.get(key);
         if(target_node == null){
             return;
         }
@@ -128,7 +137,29 @@ public class LRUCache implements LRUCacheInterface {
      * @param key Identifier with a corresponding Object stored in the cache
      * @return boolean whether the key exists in the hashmap or not.
      */
-    public boolean checkCache(UUID key ){ //Check if something in the cache
+    public boolean checkCache(K key ){ //Check if something in the cache
        return (this.hash_map.containsKey(key));
     }
+
+    /**
+     * Method  to test the cache's contents, without re-ordering the list priority.
+     * ** Do not use for anything other than testing **
+     * @param key Identifier with a corresponding Object stored in the cache
+     * @return V - value stored in cache
+     */
+    public V testGetCacheContents(K key){
+
+        return this.hash_map.get(key).getValue();
+
+    }
+    public LRUNode<K,V> testGetCacheList(){
+        return this.head.next;
+    }
+    public boolean isNodeTail(LRUNode<K,V> node){
+        if(tail.equals(node)){
+            return true;
+        }
+        return false;
+    }
+
 }

@@ -6,10 +6,10 @@ import java.util.UUID;
  * interface to specify the LRU cache base functionality.
  * @author sean-harnett
  */
-public interface LRUCacheInterface {
+public interface LRUCacheInterface<K, V> {
 
-    public Object get(UUID key);
-    public void put(UUID key, Object value); //Contains the full name of the student or instructor
-    public void cacheDelete(UUID key);
+    public V get(K key);
+    public void put(K key, V value); //Contains the full name of the student or instructor
+    public void cacheDelete(K key);
 
 }

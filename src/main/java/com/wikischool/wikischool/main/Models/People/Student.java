@@ -13,12 +13,12 @@ import java.util.UUID;
  * @author sean-harnett
  */
 public class Student  {
+
     private UUID id;
     private String firstName;
     private String lastName;
-    //private SizeConstants sizeConstants;
-    //What type of list..? -> arrayList most likely
-    List<Course> courses; //store whole course object, or just a set of UUIDs...?
+    List<Course> courses;
+
 
 
     /**
@@ -28,11 +28,11 @@ public class Student  {
      * @param firstName Students first name
      * @param lastName Students last name
      */
-    public Student(UUID id, String firstName, String lastName) { // add course list initial capacity capacity...?
+    public Student(UUID id, String firstName, String lastName) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.courses = new ArrayList<Course>(SizeConstants.DEFAULT_LIST_LENGTH); // will need to be instantiated when I decide what list to make it
+        this.courses = new ArrayList<Course>(SizeConstants.DEFAULT_LIST_LENGTH);
     }
 
     /**
@@ -77,6 +77,7 @@ public class Student  {
     }
 
     //Getters + Setters:
+
     public List<Course> getCourses(){
         return this.courses;
     }

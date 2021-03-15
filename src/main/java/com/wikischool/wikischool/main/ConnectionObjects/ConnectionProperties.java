@@ -52,10 +52,11 @@ public class ConnectionProperties {
     }
 
     /**
-     * Create a fileReader object, and load in the new target properties file.
+     * Create a fileReader object, replacing any existing one, and load in the new target properties file.
      */
     public void loadFileReader() {
         try {
+                fileReader = null;
                 fileReader = new FileReader(connectionPropertiesFileLocation);
         } catch (FileNotFoundException e) {
             System.out.println(e);

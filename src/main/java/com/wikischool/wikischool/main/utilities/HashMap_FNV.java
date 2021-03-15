@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Hash Map implementation. Keys are hashed using Fowler-NOLL-Vo hash function
@@ -14,7 +13,7 @@ import java.util.UUID;
  *
  */
 
-public class HashMap_FNV<Key, Value> { // 32 bit integer hash
+public class HashMap_FNV<K, V> { // 32 bit integer hash
 
     /*Both FNV_32 constants are standard FNV_32 values*/
     // The base hash value to start with:
@@ -27,15 +26,15 @@ public class HashMap_FNV<Key, Value> { // 32 bit integer hash
     private final int MAP_EMPTY = 0;
     private int element_count;
 
-    private HashSet<Key> keySet; //Contains map keys
-    private Bucket<Key, Value> map[];
+    private HashSet<K> keySet; //Contains map keys
+    private Bucket<K, V> map[];
 
     //
     /**
      * Root node periodically set to a map index.
      * References the list of values stored at that index, but it itself contains no value.
      */
-    private Bucket<Key, Value> entry_root;
+    private Bucket<K, V> entry_root;
 
     /**
      * Main constructor.
@@ -46,8 +45,8 @@ public class HashMap_FNV<Key, Value> { // 32 bit integer hash
         this.capacity = given_capacity;
         this.map = new Bucket[given_capacity];
         this.entry_root = null;
-        Arrays.fill(map, new Bucket<Key, Value>(null, null, null, null)); // initialize root buckets
-        this.keySet = new HashSet<Key>(given_capacity);
+        Arrays.fill(map, new Bucket<K, V>(null, null, null, null)); // initialize root buckets
+        this.keySet = new HashSet<K>(given_capacity);
     }
 
     /**
@@ -58,11 +57,11 @@ public class HashMap_FNV<Key, Value> { // 32 bit integer hash
      * @param key Identifier for the map entry
      * @param value Object stored in the map
      */
-    public void put(Key key, Value value) {
+    public void put(K key, V value) {
         if (isMapFull()) {
             return;
         }
-        Bucket<Key, Value> target = getTarget(key);
+        Bucket<K, V> target = getTarget(key);
         if (target == null) {
 
             target = new Bucket<>(key, value, null, this.entry_root);
@@ -73,7 +72,7 @@ public class HashMap_FNV<Key, Value> { // 32 bit integer hash
         }
         while (target.key != key) {
             if (target.next == null) {
-                target.next = new Bucket<Key, Value>(key, value, null, target);
+                target.next = new Bucket<K, V>(key, value, null, target);
                 element_count++;
                 keySet.add(key);
                 return;
@@ -90,11 +89,11 @@ public class HashMap_FNV<Key, Value> { // 32 bit integer hash
      * @return Value object contained int the map for the corresponding key
      */
 
-    public Value get(Key key) {
+    public V get(K key) {
         if (isMapEmpty()) {
             return null;
         }
-        Bucket<Key, Value> target = getTarget(key);
+        Bucket<K, V> target = getTarget(key);
         while (target != null && target.key != key) {
             target = target.next;
         }
@@ -109,11 +108,11 @@ public class HashMap_FNV<Key, Value> { // 32 bit integer hash
      * @param key Identifier for the map entry
      */
 
-    public void remove(Key key) {
+    public void remove(K key) {
         if (isMapEmpty()) {
             return;
         }
-        Bucket<Key, Value> target = getTarget(key);
+        Bucket<K, V> target = getTarget(key);
 
         if (target != null) {
             while (target.key != key) {
@@ -158,7 +157,7 @@ public class HashMap_FNV<Key, Value> { // 32 bit integer hash
      * @param key key to check for
      * @return boolean - whether a mapping exists for the given key
      */
-    public boolean containsKey(UUID key) { // check if mapping for key, and then throway object
+    public boolean containsKey(K key) { // check if mapping for key, and then throw-away object
         return keySet.contains(key);
     }
 
@@ -166,7 +165,7 @@ public class HashMap_FNV<Key, Value> { // 32 bit integer hash
      *  returns the current set of keys stored in the map
      * @return this.keySet
      */
-    public Set<Key> keySet() {
+    public Set<K> keySet() {
         return this.keySet;
     }
 
@@ -176,7 +175,7 @@ public class HashMap_FNV<Key, Value> { // 32 bit integer hash
      * @param key
      * @return Bucket type, corresponding to the head of the list of buckets where values are stored.
      */
-    private Bucket getTarget(Key key) {
+    private Bucket getTarget(K key) {
         int hash_key = hash(key.hashCode());
         this.entry_root = map[hash_key];
         return this.entry_root.next;

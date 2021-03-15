@@ -24,10 +24,19 @@ public class JdbcConnection implements PostgresqlConnection {
     /**
      * Constructor -> used to immediately initialize the properties file.
      */
-    public JdbcConnection() {
+    public JdbcConnection(String connectionPropertiesFileLocation) {
         this.properties = new ConnectionProperties("src/main/java/com/wikischool/wikischool/databaseConnectionPropertiesFile.properties");
     }
+    public JdbcConnection(){
 
+    }
+
+    public void setPropertiesFile(String connectionPropertiesFileLocation){
+        this.properties = new ConnectionProperties("src/main/java/com/wikischool/wikischool/databaseConnectionPropertiesFile.properties");
+    }
+    public Connection getConnectionObj(){
+        return this.connection;
+    }
     /**
      * Use the ConnectionProperties object to load and read the properties from a file,
      * and then set them to corresponding field in this object.
