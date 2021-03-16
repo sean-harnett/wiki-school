@@ -1,9 +1,0 @@
-com.wikischool.wikischool
-com.wikischool.wikischool.main.ConnectionObjects
-com.wikischool.wikischool.main.Models
-com.wikischool.wikischool.main.Models.Interfaces
-com.wikischool.wikischool.main.Models.People
-com.wikischool.wikischool.main.Models.Types
-com.wikischool.wikischool.main.Queries
-com.wikischool.wikischool.main.Services
-com.wikischool.wikischool.main.utilities
