@@ -30,6 +30,10 @@ public class JdbcConnection implements PostgresqlConnection {
     public JdbcConnection(){
 
     }
+    public void closeConnection() throws SQLException{
+        this.connection.close();
+
+    }
 
     public void setPropertiesFile(String connectionPropertiesFileLocation){
         this.properties = new ConnectionProperties("src/main/java/com/wikischool/wikischool/databaseConnectionPropertiesFile.properties");
@@ -57,11 +61,9 @@ public class JdbcConnection implements PostgresqlConnection {
      */
     public void establishConnection() {
 
-        try (Connection connection1 = DriverManager.getConnection(connectionUrl, userName, password)) {
-
-            this.connection = connection1;
+        try  {
+            this.connection = DriverManager.getConnection(connectionUrl, userName, password);
             System.out.println("Connection Established");
-
         }
         catch (SQLException e) {
             System.out.println("Connection Failed");
