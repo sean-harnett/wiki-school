@@ -1,4 +1,4 @@
-package com.wikischool.wikischool.main.Models;
+package com.wikischool.wikischool.main.Models.Types;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,6 +1,7 @@
-package com.wikischool.wikischool.main.Models;
+package com.wikischool.wikischool.main.Services;
 
 import com.wikischool.wikischool.main.Models.Interfaces.Standard_Service_Operations;
+import com.wikischool.wikischool.main.Models.Types.Note;
 import com.wikischool.wikischool.main.utilities.NoteAttributeIndex;
 
 
