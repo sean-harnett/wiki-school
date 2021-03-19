@@ -1,13 +1,18 @@
 package com.wikischool.wikischool.main.utilities;
 
 
+import java.util.ArrayList;
+
 /**
- * Formats strings.
+ * Inserts variable number of String attributes into a source String through corresponding indexes.
  *
  * @author sean-harnett
  */
 public class StringFormatter {
 
+    private final ArrayList<Formatter_Node> formattingAttributes = new ArrayList<>();
+    private String source;
+    private boolean clearNodes;
 
     /**
      * Empty Constructor.
@@ -17,29 +22,88 @@ public class StringFormatter {
 
     /**
      * Add new attributes to a string.
-     *  **This method also calculates the new location of each attribute as it inserts them into the string.**
-     * Used in this project to change SQL queries, and allow for dynamic addition of table names, and variable number of Update columns.
+     * **This method also calculates the new location of each attribute as it inserts them into the string.**
+     * Used in this project to change SQL queries, and allow for dynamic addition of table names, and variable number of columns.
      * Not safe for client provided Strings. This method is only safe when the values are determined server side.
-     * @see FormatterNode
-     * @param source     String to create the new string to insert placeholders, and format with new attributes.
-     * @param attributes The array of 'Formatter Nodes' -> these contain an index, and a String to insert said index.
+     *
      * @return A new String with attributes added.
      */
-    public String constructNewString(String source, Object[] attributes) {
+    public String constructNewString() {
 
-        FormatterNode[] formatterNodeAttributes = (FormatterNode[])attributes;
+        int attributesLength = this.formattingAttributes.size();
         StringBuilder builder = new StringBuilder(source);
 
-        int attributesLength = attributes.length;
-        FormatterNode currentAttribute;
+        Formatter_Node currentAttributeNode;
+
         int addedLength = 0;
+        String currentAttribute;
+
         for (int ix = 0; ix < attributesLength; ix++) {
-            currentAttribute = formatterNodeAttributes[ix];
-            builder.insert((currentAttribute.getInsertionIndex() + addedLength), currentAttribute.getAttribute());
-            addedLength = currentAttribute.getAttribute().length();
+            currentAttributeNode = this.formattingAttributes.get(ix);
+            currentAttribute = currentAttributeNode.getAttribute();
+            builder.insert((currentAttributeNode.getInsertionIndex() + addedLength), currentAttribute);
+            addedLength += currentAttribute.length();
         }
+
+        if (this.clearNodes) {
+            this.formattingAttributes.clear();
+        }
+
         return builder.toString();
 
+    }
+
+    /**
+     * Helper function to add a new node to the list, without outside classes needing to know about formatterNodes.
+     * @param attribute The string to insert
+     * @param insertionIndex The integer, corresponding to where to insert attribute.
+     */
+    public void insertNewFormatterNode(String attribute, int insertionIndex) {
+        this.formattingAttributes.add(new Formatter_Node(insertionIndex, attribute));
+    }
+
+
+    public String getSource() {
+        return source;
+    }
+
+    /**
+     * Set the String that will have attributes inserted into.
+     * @param source String to insert attributes into.
+     */
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    /**
+     * Private Class to hold an attribute, and the location within StringFormatter.source to insert it.
+     * @author sean-harnett
+     */
+    private class Formatter_Node {
+
+        private int insertionIndex;
+        private String attribute;
+
+        public Formatter_Node(int insertionIndex, String attribute) {
+            this.insertionIndex = insertionIndex;
+            this.attribute = attribute;
+        }
+
+        public int getInsertionIndex() {
+            return insertionIndex;
+        }
+
+        public void setInsertionIndex(int insertionIndex) {
+            this.insertionIndex = insertionIndex;
+        }
+
+        public String getAttribute() {
+            return attribute;
+        }
+
+        public void setAttribute(String attribute) {
+            this.attribute = attribute;
+        }
     }
 
 }

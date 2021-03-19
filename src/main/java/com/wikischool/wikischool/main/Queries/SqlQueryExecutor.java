@@ -1,8 +1,7 @@
 package com.wikischool.wikischool.main.Queries;
 
-import com.wikischool.wikischool.main.ConnectionObjects.JdbcConnection;
+import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.DatabaseConnection;
 import com.wikischool.wikischool.main.Models.Interfaces.QueryArchetype;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -13,6 +12,7 @@ import java.util.UUID;
 
 /**
  * Class to prepare statements and execute sql queries into a connected database.
+ *
  * @author sean-harnett
  */
 
@@ -21,7 +21,8 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
 
     private PreparedStatement preparedStatement;
 
-    private JdbcConnection jdbcConnection;
+
+    private DatabaseConnection databaseConnection;
 
     private ResultSet resultSet;
 
@@ -32,22 +33,21 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
      * Method to prepare the SQL statement.
      * ** Requires database connection.**
      * ** Requires a formatted sql statement.
-     * @see SqlQueryInformation
-     * @param queryInformation Object holding all relevant attributes for the query.
      *
+     * @param queryInformation Object holding all relevant attributes for the query.
+     * @see SqlQueryInformation
      */
-    private void prepareSqlStatement(SqlQueryInformation<UUID> queryInformation) {
+    private void prepareSqlStatement(SqlQueryInformation<UUID> queryInformation) throws SQLException {
         Connection conn;
-        conn = jdbcConnection.getConnectionObj();
-        if(conn == null){
-            jdbcConnection.establishConnection();
-            conn = jdbcConnection.getConnectionObj();
+        conn = databaseConnection.getConnectionObject();
+        if (conn == null) {
+            databaseConnection.establishConnection();
+            conn = databaseConnection.getConnectionObject();
         }
         try {
             this.preparedStatement = conn.prepareStatement(queryInformation.getFormattedSqlStatement());
         } catch (SQLException e) {
-            System.out.println("Error preparing statement");
-            System.out.println(e);
+            throw new SQLException(e);
         }
     }
 
@@ -57,71 +57,131 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
      * @param queryInformation Object holding all relevant attributes for the query.
      * @see SqlQueryInformation
      */
-    private void setAttributesToPreparedStatement(SqlQueryInformation<UUID> queryInformation) {
+    private void setAttributesToPreparedStatement(SqlQueryInformation<UUID> queryInformation) throws SQLException {
         try {
             int[] columnIndices = queryInformation.getAttributeSqlColumnIndices();
             Object[] attributes = queryInformation.getRecordAttributes();
-            if(columnIndices !=null && attributes != null) {
+            if (columnIndices != null && attributes != null) {
                 for (int ix = 0; ix < attributes.length; ix++) {
                     this.preparedStatement.setObject(columnIndices[ix], attributes[ix]);
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Error setting statement placeholder values");
-            System.out.println(e);
+            throw new SQLException(e);
         }
     }
 
 
     /**
      * Execute a statement that will make a change to a table, but does not return anything.
+     *
      * @param queryInformation Object holding all relevant attributes for the query.
      * @see SqlQueryInformation
      */
-    public void executeUpdateStatement(SqlQueryInformation<UUID> queryInformation) {
-        prepareSqlStatement(queryInformation);
-        setAttributesToPreparedStatement(queryInformation);
+    @Override
+    public void executeUpdateStatement(SqlQueryInformation<UUID> queryInformation) throws SQLException {
         try {
+            prepareSqlStatement(queryInformation);
+            setAttributesToPreparedStatement(queryInformation);
+
             this.preparedStatement.executeUpdate();
+
         } catch (SQLException e) {
-            System.out.println("Error executing" + queryInformation.getStatementType() + "statement");
-            System.out.println(e);
-        }finally {
-          //  try { if (this.resultSet != null) this.resultSet.close(); } catch (Exception e) {};
-         //   try { if (this.preparedStatement != null) this.preparedStatement.close(); } catch (Exception e) {};
-         //   try { if (this.jdbcConnection.checkConnection()) this.jdbcConnection.closeConnection(); } catch (Exception e) {};
+            throw new SQLException(e.getMessage());
         }
     }
+
     /**
      * Execute a SELECT query, and put the result into the ResultSet class member.
-     * @param queryInformation  Object holding all relevant attributes for the query.
+     *
+     * @param queryInformation Object holding all relevant attributes for the query.
      * @see SqlQueryInformation
      */
     @Override
-    public void executeQueryStatement(SqlQueryInformation<UUID> queryInformation) {
-        prepareSqlStatement(queryInformation);
-        setAttributesToPreparedStatement(queryInformation);
+    public void executeQueryStatement(SqlQueryInformation<UUID> queryInformation) throws SQLException {
         try {
-          this.resultSet = this.preparedStatement.executeQuery();
+            prepareSqlStatement(queryInformation);
+            setAttributesToPreparedStatement(queryInformation);
+
+            this.resultSet = this.preparedStatement.executeQuery();
+
         } catch (SQLException e) {
-            System.out.println("Error executing" + queryInformation.getStatementType() + "statement");
-            System.out.println(e);
-        } finally {
-          //  try { if (this.resultSet != null) this.resultSet.close(); } catch (SQLException e) {};
-         //   try { if (this.preparedStatement != null) this.preparedStatement.close(); } catch (SQLException e) {};
-          //  try { if (this.jdbcConnection.checkConnection()) this.jdbcConnection.closeConnection(); } catch (SQLException e) {};
+            throw new SQLException(e.getMessage());
         }
     }
 
     /**
      * Use this method to get the ResultSet class member.
      * resultSet is set during a query previously executed.
+     *
      * @return ResultSet
      */
-    public ResultSet getResultSet(){
+    public ResultSet getResultSet() {
         return this.resultSet;
     }
-    public void setJdbcConnectionObject(JdbcConnection jdbcConnection){
-        this.jdbcConnection = jdbcConnection;
+
+    public void setDatabaseConnection(DatabaseConnection databaseConnection){
+        this.databaseConnection = databaseConnection;
+
+    }
+
+
+    /**
+     * Close SQL objects, and throw their exceptions if any are encountered.
+     * @throws SQLException The thrown exception
+     */
+    public void closeAll()throws SQLException{
+        closeResultSet();
+        closeConnection();
+        closePreparedStatement();
+    }
+
+    /**
+     * Method to close SQL objects, and handle the potential SQLExceptions.
+     * @return boolean, true if no exceptions, and false if exceptions.
+     */
+    public boolean closeAllAndHandleExceptions(){
+        try{
+            closeResultSet();
+            closeConnection();
+            closePreparedStatement();
+
+        }catch(SQLException e){
+            return false;
+        }
+        return true;
+    }
+
+    public void closeResultSet() throws SQLException {
+        if (this.resultSet == null) {
+            return;
+        }
+        try {
+            this.resultSet.close();
+        } catch (SQLException e) {
+            throw new SQLException(e.getMessage());
+        }
+    }
+
+    public void closeConnection() throws SQLException {
+        if (!this.databaseConnection.checkConnection()) {
+            return;
+        }
+        try {
+            this.databaseConnection.closeConnection();
+        } catch (SQLException e) {
+            throw new SQLException(e.getMessage());
+        }
+    }
+
+    public void closePreparedStatement() throws SQLException {
+        if (this.preparedStatement == null) {
+            return;
+        }
+        try {
+            this.preparedStatement.close();
+        } catch (SQLException e) {
+            throw new SQLException(e.getMessage());
+        }
     }
 }

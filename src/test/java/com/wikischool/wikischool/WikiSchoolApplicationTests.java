@@ -1,10 +1,15 @@
 package com.wikischool.wikischool;
 //Project file imports:
 
-import com.wikischool.wikischool.main.ConnectionObjects.JdbcConnection;
+import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.DatabaseConnection;
+import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.PostgresJdbcConnector;
+import com.wikischool.wikischool.main.ConnectionObjects.Properties.PropertiesFromFile;
 import com.wikischool.wikischool.main.Queries.SqlQueryExecutor;
 import com.wikischool.wikischool.main.Queries.SqlQueryInformation;
-import com.wikischool.wikischool.main.utilities.*;
+import com.wikischool.wikischool.main.utilities.LRUCache;
+import com.wikischool.wikischool.main.utilities.LRUNode;
+import com.wikischool.wikischool.main.utilities.SizeConstants;
+import com.wikischool.wikischool.main.utilities.StringFormatter;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,8 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class WikiSchoolApplicationTests {
 
 
-    @Autowired
-    private JdbcConnection jdbcTestObject;
+    private DatabaseConnection connection;
 
     @Autowired
     private SqlQueryExecutor queryExecutor;
@@ -38,25 +43,37 @@ class WikiSchoolApplicationTests {
      * Test if the properties are read into the connection object correctly
      */
     @Test
-    public void TestConnectionProperties() {
+    public void TestProperties() {
 
-        jdbcTestObject.setPropertiesFile(WikiTestConstants.TEST_DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION);
-        jdbcTestObject.setPropertiesFromFile();
-        assertThat(jdbcTestObject.getPassword()).isEqualTo("--password--"); //Test that password is stored correctly
-        assertThat(jdbcTestObject.getUserName()).isEqualTo("postgres");
-        assertThat(jdbcTestObject.getConnectionUrl()).isEqualTo("jdbc:postgresql://localhost:5432/test");
+        this.connection = new DatabaseConnection(new PostgresJdbcConnector());
+        this.connection.setConnectionPropertyValues(new PropertiesFromFile(WikiTestConstants.TEST_DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION));
+
+        this.connection.readProperties();
+        String[] currentProperties = this.connection.getCurrentPropertyValues();
+        String[] expectedProperties = {WikiTestConstants.PROPERTY_USER_NAME,WikiTestConstants.PROPERTY_PASSWORD,WikiTestConstants.PROPERTY_URL};
+        assertThat(Arrays.equals(currentProperties, expectedProperties)).isEqualTo(true);
     }
 
     /**
-     * Test if the connection object works, and a connection can be established
+     * Check to see if connection can be established.
      */
     @Test
-    public void TestIfConnectionEstablished() {
-        jdbcTestObject.setPropertiesFile(WikiTestConstants.TEST_DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION);
-        jdbcTestObject.setPropertiesFromFile();
-        jdbcTestObject.establishConnection();
-        assertThat(jdbcTestObject.checkConnection()).isEqualTo(true);
+    public void TestConnection() {
+
+        this.connection = new DatabaseConnection(new PostgresJdbcConnector());
+        this.connection.setConnectionPropertyValues(new PropertiesFromFile(WikiTestConstants.TEST_DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION));
+
+        this.connection.readProperties();
+
+        try {
+            this.connection.establishConnection();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        assertThat(this.connection.checkConnection()).isEqualTo(true);
+
     }
+
 
     /**
      * Test if LRUCache 'put' method implementation removes the least recently used element
@@ -107,61 +124,90 @@ class WikiSchoolApplicationTests {
     @Test
     public void TestStringFormatter() {
         SqlQueryInformation<UUID> queryInformation = new SqlQueryInformation();
+
         StringFormatter stringFormatter = new StringFormatter();
 
         queryInformation.setSqlStatement(WikiTestConstants.TEST_STUDENT_TABLE_QUERY); // Does not contain table name.
 
         String query = WikiTestConstants.TEST_STUDENT_TABLE_QUERY;
 
-        //Create two formatt attributes to insert into the query:
+        //Create two format attributes to insert into the query:
 
         int insertIndex = (query.indexOf("SELECT") + "SELECT".length()); // find where to insert the first one:
-        FormatterNode formatAttributeTestNode_1 = new FormatterNode(insertIndex, WikiTestConstants.TEST_SQL_ALL);
+
+        stringFormatter.insertNewFormatterNode(WikiTestConstants.TEST_SQL_ALL, insertIndex);
 
         insertIndex = (query.indexOf("FROM") + "FROM".length()); // find where to insert the second one:
-        FormatterNode formatAttributeTestNode_2 = new FormatterNode(insertIndex, WikiTestConstants.TEST_STUDENT_TABLE);
 
-        FormatterNode[] formatterNodes = {formatAttributeTestNode_1, formatAttributeTestNode_2};
+        stringFormatter.insertNewFormatterNode(WikiTestConstants.TEST_STUDENT_TABLE, insertIndex);
 
-        queryInformation.setFormattedSqlStatement(stringFormatter.constructNewString(queryInformation.getSqlStatement(), formatterNodes)); // format query
+        stringFormatter.setSource(queryInformation.getSqlStatement());
+
+        queryInformation.setFormattedSqlStatement(stringFormatter.constructNewString());
 
         assertThat(queryInformation.getFormattedSqlStatement()).isEqualTo(WikiTestConstants.TEST_STRING_FORMATTING_STUDENT_RESULT_QUERY);
+
+
     }
 
     /**
      * Test execution of sql query that does not update a table in the databse.
      */
+
     @Test
     public void TestSelectStatement() {
+
         SqlQueryInformation<UUID> queryInformation = new SqlQueryInformation();
+
         StringFormatter stringFormatter = new StringFormatter();
 
         queryInformation.setSqlStatement(WikiTestConstants.TEST_STUDENT_TABLE_QUERY); // Does not contain table name.
 
         String query = WikiTestConstants.TEST_STUDENT_TABLE_QUERY;
-        FormatterNode Node = new FormatterNode((query.indexOf("SELECT") + "SELECT".length()), WikiTestConstants.TEST_SQL_ALL);
-        FormatterNode Node2 = new FormatterNode((query.indexOf("FROM") + "FROM".length()), WikiTestConstants.TEST_STUDENT_TABLE);
-        FormatterNode[] formatterNodes = {Node, Node2};
 
-        queryInformation.setFormattedSqlStatement(stringFormatter.constructNewString(queryInformation.getSqlStatement(), formatterNodes));
+        //Create two format attributes to insert into the query:
 
-        this.jdbcTestObject.setPropertiesFile(WikiTestConstants.TEST_DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION);
-        this.jdbcTestObject.setPropertiesFromFile();
-        this.jdbcTestObject.establishConnection();
+        int insertIndex = (query.indexOf("SELECT") + "SELECT".length()); // find where to insert the first one:
 
-        this.queryExecutor.setJdbcConnectionObject(this.jdbcTestObject);
-        this.queryExecutor.executeQueryStatement(queryInformation);
+        stringFormatter.insertNewFormatterNode(WikiTestConstants.TEST_SQL_ALL, insertIndex);
 
-        ResultSet rs = queryExecutor.getResultSet();
+        insertIndex = (query.indexOf("FROM") + "FROM".length()); // find where to insert the second one:
 
+        stringFormatter.insertNewFormatterNode(WikiTestConstants.TEST_STUDENT_TABLE, insertIndex);
+
+        stringFormatter.setSource(queryInformation.getSqlStatement());
+
+        queryInformation.setFormattedSqlStatement(stringFormatter.constructNewString());
+
+
+        DatabaseConnection conn = new DatabaseConnection(new PostgresJdbcConnector());
+        conn.setConnectionPropertyValues(new PropertiesFromFile(WikiTestConstants.TEST_DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION));
+
+        conn.readProperties();
+
+        this.queryExecutor.setDatabaseConnection(conn);
         try {
+            this.queryExecutor.executeQueryStatement(queryInformation);
+
+            ResultSet rs = queryExecutor.getResultSet();
+
             rs.next();
+
             UUID testIndexPK = rs.getObject(1, UUID.class);
+
             System.out.println(testIndexPK);
+
         } catch (SQLException e) {
             System.out.println(e);
         }
 
+        //Close all SQL objects:
+        try {
+            this.queryExecutor.closeAll();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
     }
+
 
 }
