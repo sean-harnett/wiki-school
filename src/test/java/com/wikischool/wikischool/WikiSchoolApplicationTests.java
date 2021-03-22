@@ -6,10 +6,10 @@ import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.Po
 import com.wikischool.wikischool.main.ConnectionObjects.Properties.PropertiesFromFile;
 import com.wikischool.wikischool.main.Queries.SqlQueryExecutor;
 import com.wikischool.wikischool.main.Queries.SqlQueryInformation;
-import com.wikischool.wikischool.main.utilities.LRUCache;
-import com.wikischool.wikischool.main.utilities.LRUNode;
-import com.wikischool.wikischool.main.utilities.SizeConstants;
-import com.wikischool.wikischool.main.utilities.StringFormatter;
+import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache;
+import com.wikischool.wikischool.main.utilities.DataStructures.LRUNode;
+import com.wikischool.wikischool.main.utilities.Constants.SizeConstants;
+import com.wikischool.wikischool.main.utilities.StringFormatting.StringFormatter;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +46,11 @@ class WikiSchoolApplicationTests {
     public void TestProperties() {
 
         this.connection = new DatabaseConnection(new PostgresJdbcConnector());
-        this.connection.setConnectionPropertyValues(new PropertiesFromFile(WikiTestConstants.TEST_DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION));
+        this.connection.setConnectionPropertyValues(new PropertiesFromFile(WikiTestConstants.DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION));
 
         this.connection.readProperties();
         String[] currentProperties = this.connection.getCurrentPropertyValues();
-        String[] expectedProperties = {WikiTestConstants.PROPERTY_USER_NAME,WikiTestConstants.PROPERTY_PASSWORD,WikiTestConstants.PROPERTY_URL};
+        String[] expectedProperties = {WikiTestConstants.PROPERTY_USER_NAME, WikiTestConstants.PROPERTY_PASSWORD, WikiTestConstants.PROPERTY_URL};
         assertThat(Arrays.equals(currentProperties, expectedProperties)).isEqualTo(true);
     }
 
@@ -61,7 +61,7 @@ class WikiSchoolApplicationTests {
     public void TestConnection() {
 
         this.connection = new DatabaseConnection(new PostgresJdbcConnector());
-        this.connection.setConnectionPropertyValues(new PropertiesFromFile(WikiTestConstants.TEST_DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION));
+        this.connection.setConnectionPropertyValues(new PropertiesFromFile(WikiTestConstants.DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION));
 
         this.connection.readProperties();
 
@@ -78,7 +78,7 @@ class WikiSchoolApplicationTests {
     /**
      * Test if LRUCache 'put' method implementation removes the least recently used element
      */
-    //  @Test
+    @Test
     public void TestLRUCache() {
         LRUCache<Integer, Integer> cache = new LRUCache<>(SizeConstants.DEFAULT_CACHE_LENGTH);
         int testArrayLength = 10;
@@ -127,25 +127,25 @@ class WikiSchoolApplicationTests {
 
         StringFormatter stringFormatter = new StringFormatter();
 
-        queryInformation.setSqlStatement(WikiTestConstants.TEST_STUDENT_TABLE_QUERY); // Does not contain table name.
+        queryInformation.setSqlStatement(WikiTestConstants.STUDENT_TABLE_QUERY); // Does not contain table name.
 
-        String query = WikiTestConstants.TEST_STUDENT_TABLE_QUERY;
+        String query = WikiTestConstants.STUDENT_TABLE_QUERY;
 
         //Create two format attributes to insert into the query:
 
         int insertIndex = (query.indexOf("SELECT") + "SELECT".length()); // find where to insert the first one:
 
-        stringFormatter.insertNewFormatterNode(WikiTestConstants.TEST_SQL_ALL, insertIndex);
+        stringFormatter.insertNewFormatterNode(WikiTestConstants.SQL_ALL, insertIndex);
 
         insertIndex = (query.indexOf("FROM") + "FROM".length()); // find where to insert the second one:
 
-        stringFormatter.insertNewFormatterNode(WikiTestConstants.TEST_STUDENT_TABLE, insertIndex);
+        stringFormatter.insertNewFormatterNode(WikiTestConstants.STUDENT_TABLE, insertIndex);
 
         stringFormatter.setSource(queryInformation.getSqlStatement());
 
         queryInformation.setFormattedSqlStatement(stringFormatter.constructNewString());
 
-        assertThat(queryInformation.getFormattedSqlStatement()).isEqualTo(WikiTestConstants.TEST_STRING_FORMATTING_STUDENT_RESULT_QUERY);
+        assertThat(queryInformation.getFormattedSqlStatement()).isEqualTo(WikiTestConstants.STRING_FORMATTING_STUDENT_RESULT_QUERY);
 
 
     }
@@ -161,19 +161,19 @@ class WikiSchoolApplicationTests {
 
         StringFormatter stringFormatter = new StringFormatter();
 
-        queryInformation.setSqlStatement(WikiTestConstants.TEST_STUDENT_TABLE_QUERY); // Does not contain table name.
+        queryInformation.setSqlStatement(WikiTestConstants.STUDENT_TABLE_QUERY); // Does not contain table name.
 
-        String query = WikiTestConstants.TEST_STUDENT_TABLE_QUERY;
+        String query = WikiTestConstants.STUDENT_TABLE_QUERY;
 
         //Create two format attributes to insert into the query:
 
         int insertIndex = (query.indexOf("SELECT") + "SELECT".length()); // find where to insert the first one:
 
-        stringFormatter.insertNewFormatterNode(WikiTestConstants.TEST_SQL_ALL, insertIndex);
+        stringFormatter.insertNewFormatterNode(WikiTestConstants.SQL_ALL, insertIndex);
 
         insertIndex = (query.indexOf("FROM") + "FROM".length()); // find where to insert the second one:
 
-        stringFormatter.insertNewFormatterNode(WikiTestConstants.TEST_STUDENT_TABLE, insertIndex);
+        stringFormatter.insertNewFormatterNode(WikiTestConstants.STUDENT_TABLE, insertIndex);
 
         stringFormatter.setSource(queryInformation.getSqlStatement());
 
@@ -181,7 +181,7 @@ class WikiSchoolApplicationTests {
 
 
         DatabaseConnection conn = new DatabaseConnection(new PostgresJdbcConnector());
-        conn.setConnectionPropertyValues(new PropertiesFromFile(WikiTestConstants.TEST_DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION));
+        conn.setConnectionPropertyValues(new PropertiesFromFile(WikiTestConstants.DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION));
 
         conn.readProperties();
 
@@ -207,6 +207,65 @@ class WikiSchoolApplicationTests {
         } catch (SQLException e) {
             System.out.println(e);
         }
+    }
+
+    /**
+     * Test execution of sql query that does update a table in the database.
+     */
+    @Test
+    public void TestUpdateQuery(){
+        SqlQueryInformation<UUID> queryInformation = new SqlQueryInformation();
+
+        StringFormatter stringFormatter = new StringFormatter();
+
+
+        UUID id = UUID.fromString(WikiTestConstants.TEST_STUDENT_ID);
+        Object[] attributes = {"Xuan", id};
+        int[] columnIndices = {1,2};
+
+        queryInformation.setRecordAttributes(attributes);
+        queryInformation.setAttributeSqlColumnIndices(columnIndices);
+
+        queryInformation.setSqlStatement(WikiTestConstants.STUDENT_TABLE_UPDATE + " " + WikiTestConstants.UPDATE_WHERE); // Does not contain table name.
+
+        String query = WikiTestConstants.STUDENT_TABLE_UPDATE + " " + WikiTestConstants.UPDATE_WHERE;
+
+        //Create two format attributes to insert into the query:
+
+        int insertIndex = (query.indexOf("UPDATE") + "UPDATE".length()); // find where to insert the first one:
+
+        stringFormatter.insertNewFormatterNode(WikiTestConstants.STUDENT_TABLE, insertIndex);
+
+        insertIndex = (query.indexOf("SET") + "SET".length()); // find where to insert the second one:
+
+        String newInsert = WikiTestConstants.STUDENT_COLUMN_FIRST_NAME + WikiTestConstants.UPDATE_PLACEHOLDER;
+
+        stringFormatter.insertNewFormatterNode(newInsert, insertIndex);
+
+        insertIndex = (query.indexOf("WHERE") + "WHERE".length());
+
+        newInsert = WikiTestConstants.ID_FIELD + " " + WikiTestConstants.UPDATE_PLACEHOLDER;
+
+        stringFormatter.insertNewFormatterNode(newInsert, insertIndex);
+
+        stringFormatter.setSource(queryInformation.getSqlStatement());
+
+        queryInformation.setFormattedSqlStatement(stringFormatter.constructNewString());
+        System.out.println(queryInformation.getFormattedSqlStatement());
+
+
+        DatabaseConnection conn = new DatabaseConnection(new PostgresJdbcConnector());
+        conn.setConnectionPropertyValues(new PropertiesFromFile(WikiTestConstants.DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION));
+
+        conn.readProperties();
+
+        this.queryExecutor.setDatabaseConnection(conn);
+        try{
+            this.queryExecutor.executeUpdateStatement(queryInformation);
+        }catch(SQLException e){
+            System.out.println(e);
+        }
+
     }
 
 

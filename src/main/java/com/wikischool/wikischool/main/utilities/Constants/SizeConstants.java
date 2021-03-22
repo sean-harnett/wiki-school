@@ -1,4 +1,4 @@
-package com.wikischool.wikischool.main.utilities;
+package com.wikischool.wikischool.main.utilities.Constants;
 
 /**
  * Constants used to create default sizes for different entities in the application.

@@ -1,6 +1,6 @@
 package com.wikischool.wikischool.main.ConnectionObjects.Properties;
 
-import com.wikischool.wikischool.main.utilities.PropertiesAttributeIndex;
+import com.wikischool.wikischool.main.utilities.EnumIndices.PropertiesAttributeIndex;
 
 /**
  * Interface guaranteeing the ability to obtain properties from somewhere, and get them through a propertiesIndex Enum.

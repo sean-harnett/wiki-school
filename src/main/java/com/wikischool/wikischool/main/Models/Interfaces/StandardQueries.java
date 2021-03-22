@@ -2,15 +2,14 @@ package com.wikischool.wikischool.main.Models.Interfaces;
 
 
 import com.wikischool.wikischool.main.Queries.SqlQueryInformation;
-
-import java.util.Map;
-import java.util.UUID;
+import com.wikischool.wikischool.main.utilities.EnumIndices.NoteAttributeIndex;
+import com.wikischool.wikischool.main.utilities.EnumIndices.StudentAttributeIndex;
 
 /**
  * Interface to implement standard queries used to interact with records in a database.
  * For examples of AttributeIndexEnum types:
- * @see com.wikischool.wikischool.main.utilities.StudentAttributeIndex
- * @see com.wikischool.wikischool.main.utilities.NoteAttributeIndex
+ * @see StudentAttributeIndex
+ * @see NoteAttributeIndex
  *
  *
  * @author sean-harnett

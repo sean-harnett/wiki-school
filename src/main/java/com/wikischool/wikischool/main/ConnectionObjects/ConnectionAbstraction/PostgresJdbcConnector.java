@@ -1,7 +1,7 @@
 package com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction;
 
 import com.wikischool.wikischool.main.ConnectionObjects.Properties.StandardConnectionProperties;
-import com.wikischool.wikischool.main.utilities.PropertiesAttributeIndex;
+import com.wikischool.wikischool.main.utilities.EnumIndices.PropertiesAttributeIndex;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

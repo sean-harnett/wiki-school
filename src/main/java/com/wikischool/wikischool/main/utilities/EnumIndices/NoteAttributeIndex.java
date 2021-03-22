@@ -1,4 +1,4 @@
-package com.wikischool.wikischool.main.utilities;
+package com.wikischool.wikischool.main.utilities.EnumIndices;
 
 /**
  * Enum used to access Attributes corresponding to a Note object from a map.

@@ -1,6 +1,6 @@
 package com.wikischool.wikischool.main.ConnectionObjects.Properties;
 
-import com.wikischool.wikischool.main.utilities.PropertiesAttributeIndex;
+import com.wikischool.wikischool.main.utilities.EnumIndices.PropertiesAttributeIndex;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

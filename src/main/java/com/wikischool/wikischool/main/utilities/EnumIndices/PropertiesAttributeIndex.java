@@ -1,4 +1,4 @@
-package com.wikischool.wikischool.main.utilities;
+package com.wikischool.wikischool.main.utilities.EnumIndices;
 
 /**
  * This Enum corresponds to names of properties from a properties file.

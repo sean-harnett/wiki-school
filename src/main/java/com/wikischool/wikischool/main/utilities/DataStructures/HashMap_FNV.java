@@ -1,4 +1,4 @@
-package com.wikischool.wikischool.main.utilities;
+package com.wikischool.wikischool.main.utilities.DataStructures;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

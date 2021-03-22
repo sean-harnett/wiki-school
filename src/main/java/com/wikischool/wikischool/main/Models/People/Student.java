@@ -1,7 +1,7 @@
 package com.wikischool.wikischool.main.Models.People;
 
 import com.wikischool.wikischool.main.Models.Types.Course;
-import com.wikischool.wikischool.main.utilities.SizeConstants;
+import com.wikischool.wikischool.main.utilities.Constants.SizeConstants;
 
 import java.util.ArrayList;
 import java.util.List;

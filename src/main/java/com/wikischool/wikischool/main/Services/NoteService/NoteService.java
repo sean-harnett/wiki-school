@@ -1,8 +1,8 @@
-package com.wikischool.wikischool.main.Services;
+package com.wikischool.wikischool.main.Services.NoteService;
 
 import com.wikischool.wikischool.main.Models.Interfaces.Standard_Service_Operations;
 import com.wikischool.wikischool.main.Models.Types.Note;
-import com.wikischool.wikischool.main.utilities.NoteAttributeIndex;
+import com.wikischool.wikischool.main.utilities.EnumIndices.NoteAttributeIndex;
 
 
 import java.time.LocalDate;

@@ -1,6 +1,4 @@
-package com.wikischool.wikischool.main.utilities;
-
-import java.util.UUID;
+package com.wikischool.wikischool.main.utilities.DataStructures;
 
 /**
  * Node used in the LRU cache implementation.
