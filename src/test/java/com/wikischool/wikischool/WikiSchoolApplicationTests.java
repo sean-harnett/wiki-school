@@ -6,8 +6,8 @@ import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.Po
 import com.wikischool.wikischool.main.ConnectionObjects.Properties.PropertiesFromFile;
 import com.wikischool.wikischool.main.Queries.SqlQueryExecutor;
 import com.wikischool.wikischool.main.Queries.SqlQueryInformation;
-import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache;
-import com.wikischool.wikischool.main.utilities.DataStructures.LRUNode;
+import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache.LRUCache;
+import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache.LRUNode;
 import com.wikischool.wikischool.main.utilities.Constants.SizeConstants;
 import com.wikischool.wikischool.main.utilities.StringFormatting.StringFormatter;
 import org.junit.jupiter.api.Test;

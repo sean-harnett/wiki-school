@@ -1,5 +1,7 @@
-package com.wikischool.wikischool.main.utilities.DataStructures;
+package com.wikischool.wikischool.main.utilities.DataStructures.LRUCache;
 
+
+import com.wikischool.wikischool.main.utilities.DataStructures.FNVHashMap.HashMap_FNV;
 
 /**
  * Implementation of a Least Recently Used (LRU) cache.

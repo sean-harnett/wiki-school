@@ -1,4 +1,4 @@
-package com.wikischool.wikischool.main.utilities.DataStructures;
+package com.wikischool.wikischool.main.utilities.DataStructures.FNVHashMap;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

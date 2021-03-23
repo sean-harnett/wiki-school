@@ -1,4 +1,4 @@
-package com.wikischool.wikischool.main.utilities.DataStructures;
+package com.wikischool.wikischool.main.utilities.DataStructures.LRUCache;
 
 import java.util.UUID;
 

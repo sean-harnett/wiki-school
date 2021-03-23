@@ -3,8 +3,8 @@ package com.wikischool.wikischool.main.Services.StudentService;
 import com.wikischool.wikischool.main.Models.Interfaces.Standard_Service_Operations;
 import com.wikischool.wikischool.main.Models.People.Student;
 import com.wikischool.wikischool.main.Models.Types.Course;
-import com.wikischool.wikischool.main.utilities.DataStructures.HashMap_FNV;
-import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache;
+import com.wikischool.wikischool.main.utilities.DataStructures.FNVHashMap.HashMap_FNV;
+import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache.LRUCache;
 import com.wikischool.wikischool.main.utilities.Constants.SizeConstants;
 import com.wikischool.wikischool.main.utilities.EnumIndices.StudentAttributeIndex;
 import org.springframework.stereotype.Service;
@@ -16,6 +16,7 @@ import java.util.UUID;
 
 /**
  * Class to work with student objects and their functionality
+ * TODO: Refactor this into a general service abstraction
  * @author sean-harnett
  */
 

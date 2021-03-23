@@ -14,6 +14,7 @@ import java.util.UUID;
 /**
  *
  * Service class to work with Note objects.
+ * TODO: Refactor this into a general service abstraction
  * @author sean-harnett
  */
 public class NoteService implements Standard_Service_Operations<Note, NoteAttributeIndex> {

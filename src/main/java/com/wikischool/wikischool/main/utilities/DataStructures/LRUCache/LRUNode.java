@@ -1,4 +1,4 @@
-package com.wikischool.wikischool.main.utilities.DataStructures;
+package com.wikischool.wikischool.main.utilities.DataStructures.LRUCache;
 
 /**
  * Node used in the LRU cache implementation.
