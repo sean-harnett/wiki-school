@@ -8,7 +8,7 @@ import java.util.ArrayList;
  *
  * @author sean-harnett
  */
-public class StringFormatter {
+public class StringFormatter implements StatementFormatter {
 
     private final ArrayList<Formatter_Node> formattingAttributes = new ArrayList<>();
     private String source;
@@ -28,6 +28,7 @@ public class StringFormatter {
      *
      * @return A new String with attributes added.
      */
+    @Override
     public String constructNewString() {
 
         int attributesLength = this.formattingAttributes.size();
@@ -40,9 +41,9 @@ public class StringFormatter {
 
         for (int ix = 0; ix < attributesLength; ix++) {
             currentAttributeNode = this.formattingAttributes.get(ix);
-            currentAttribute = currentAttributeNode.getAttribute();
+            currentAttribute = " " + currentAttributeNode.getAttribute(); // adds an extra space before the string
             builder.insert((currentAttributeNode.getInsertionIndex() + addedLength), currentAttribute);
-            addedLength += currentAttribute.length();
+            addedLength += (currentAttribute.length());
         }
 
         if (this.clearNodes) {
@@ -58,11 +59,21 @@ public class StringFormatter {
      * @param attribute The string to insert
      * @param insertionIndex The integer, corresponding to where to insert attribute.
      */
+    @Override
+    public void addNewAttribute(String attribute, int insertionIndex) {
+        this.formattingAttributes.add(new Formatter_Node(insertionIndex, attribute));
+    }
+
+    /**
+     * Helper function to add a new node to the list, without outside classes needing to know about formatterNodes.
+     * @param attribute The string to insert
+     * @param insertionIndex The integer, corresponding to where to insert attribute.
+     */
     public void insertNewFormatterNode(String attribute, int insertionIndex) {
         this.formattingAttributes.add(new Formatter_Node(insertionIndex, attribute));
     }
 
-
+    @Override
     public String getSource() {
         return source;
     }
@@ -71,6 +82,7 @@ public class StringFormatter {
      * Set the String that will have attributes inserted into.
      * @param source String to insert attributes into.
      */
+    @Override
     public void setSource(String source) {
         this.source = source;
     }
@@ -89,9 +101,7 @@ public class StringFormatter {
             this.attribute = attribute;
         }
 
-        public int getInsertionIndex() {
-            return insertionIndex;
-        }
+        public int getInsertionIndex() { return insertionIndex;  }
 
         public void setInsertionIndex(int insertionIndex) {
             this.insertionIndex = insertionIndex;

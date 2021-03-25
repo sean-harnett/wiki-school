@@ -147,7 +147,6 @@ class WikiSchoolApplicationTests {
 
         assertThat(queryInformation.getFormattedSqlStatement()).isEqualTo(WikiTestConstants.STRING_FORMATTING_STUDENT_RESULT_QUERY);
 
-
     }
 
     /**

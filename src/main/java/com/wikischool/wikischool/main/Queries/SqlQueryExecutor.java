@@ -2,7 +2,6 @@ package com.wikischool.wikischool.main.Queries;
 
 import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.DatabaseConnection;
 import com.wikischool.wikischool.main.Models.Interfaces.QueryArchetype;
-import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,12 +14,9 @@ import java.util.UUID;
  *
  * @author sean-harnett
  */
-
-@Component
 public class SqlQueryExecutor implements QueryArchetype<UUID> {
 
     private PreparedStatement preparedStatement;
-
 
     private DatabaseConnection databaseConnection;
 
@@ -79,16 +75,18 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
      * @see SqlQueryInformation
      */
     @Override
-    public void executeUpdateStatement(SqlQueryInformation<UUID> queryInformation) throws SQLException {
+    public int executeUpdateStatement(SqlQueryInformation<UUID> queryInformation) throws SQLException {
+        int effectedRecords;
         try {
             prepareSqlStatement(queryInformation);
             setAttributesToPreparedStatement(queryInformation);
 
-            this.preparedStatement.executeUpdate();
+            effectedRecords = this.preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
             throw new SQLException(e.getMessage());
         }
+        return effectedRecords;
     }
 
     /**
@@ -120,7 +118,7 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
         return this.resultSet;
     }
 
-    public void setDatabaseConnection(DatabaseConnection databaseConnection){
+    public void setDatabaseConnection(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
 
     }
@@ -128,9 +126,10 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
 
     /**
      * Close SQL objects, and throw their exceptions if any are encountered.
+     *
      * @throws SQLException The thrown exception
      */
-    public void closeAll()throws SQLException{
+    public void closeAll() throws SQLException {
         closeResultSet();
         closeConnection();
         closePreparedStatement();
@@ -138,15 +137,16 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
 
     /**
      * Method to close SQL objects, and handle the potential SQLExceptions.
+     *
      * @return boolean, true if no exceptions, and false if exceptions.
      */
-    public boolean closeAllAndHandleExceptions(){
-        try{
+    public boolean closeAllAndHandleExceptions() {
+        try {
             closeResultSet();
             closeConnection();
             closePreparedStatement();
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             return false;
         }
         return true;

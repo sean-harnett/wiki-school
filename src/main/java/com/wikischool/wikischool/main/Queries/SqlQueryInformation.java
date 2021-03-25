@@ -10,7 +10,7 @@ public class SqlQueryInformation<K> {
 
     private K primaryKey;
 
-    private String sqlStatement; // should be ready for table formatting - containing one '%s' for the table name.
+    private String sqlStatement; // should be ready for table formatting
 
     private String formattedSqlStatement; // Used to prepare the statement.
 
@@ -22,8 +22,8 @@ public class SqlQueryInformation<K> {
 
     private int[] attributeSqlColumnIndices; //Store the sql table column indices
 
-    public SqlQueryInformation() {
-    }
+
+    public SqlQueryInformation() {}
 
     public SqlQueryInformation(K primaryKey, String tableName, String[] attributes) {
         this.primaryKey = primaryKey;

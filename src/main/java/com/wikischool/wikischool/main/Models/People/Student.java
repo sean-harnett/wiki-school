@@ -36,12 +36,11 @@ public class Student  {
     }
 
     /**
-     * Minimal constructor instanciating a student with only an ID.
+     * Minimal constructor instantiating a student with only an ID.
      * @param id UUID for student
      */
     public Student(UUID id){
         this.id = id;
-
     }
 
     /**
