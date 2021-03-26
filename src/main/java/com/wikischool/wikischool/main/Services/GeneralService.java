@@ -1,6 +1,5 @@
 package com.wikischool.wikischool.main.Services;
 
-import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.DatabaseConnection;
 import com.wikischool.wikischool.main.Queries.QueryFormatter;
 import com.wikischool.wikischool.main.Queries.SqlQueryExecutor;
 import com.wikischool.wikischool.main.Queries.SqlQueryInformation;
@@ -17,54 +16,61 @@ import java.util.UUID;
  * @see SqlQueryExecutor
  * @see QueryFormatter
  * @see SqlQueryInformation
+ * TODO: setup the QueryFormatter to be autowired.
  * @author sean-harnett
  *
  */
 public abstract class GeneralService {
 
-    private final SqlQueryExecutor queryExecutor;
 
-    private final TableAttributes tableAttributes;
+    private SqlQueryExecutor queryExecutor;
+
+    private TableAttributes tableAttributes;
 
     private final QueryFormatter queryFormatter;
 
-    private SqlQueryInformation<UUID> queryInformation;
+    protected SqlQueryInformation<UUID> queryInformation;
 
 
-    public GeneralService(TableAttributes tableAttributes, StatementFormatter formatterType) {
-        this.queryExecutor = new SqlQueryExecutor();
+    public GeneralService(TableAttributes tableAttributes, StatementFormatter formatterType, SqlQueryExecutor executor) {
+
         this.tableAttributes = tableAttributes;
         this.queryFormatter = new QueryFormatter(formatterType);
-    }
-
-    public GeneralService(TableAttributes tableAttributes, SqlQueryExecutor executor, QueryFormatter queryFormatter) {
-        this.tableAttributes = tableAttributes;
         this.queryExecutor = executor;
+    }
+
+    public GeneralService(TableAttributes tableAttributes, QueryFormatter queryFormatter, SqlQueryExecutor executor) {
+        this.tableAttributes = tableAttributes;
         this.queryFormatter = queryFormatter;
+        this.queryExecutor = executor;
+    }
+    protected void readProperties(){
+        this.queryExecutor.readProperties();
     }
 
-    public SqlQueryInformation<UUID> constructStatement(String statement, String[] attributes, String delimiter) {
-        this.queryInformation = this.queryFormatter.constructStatement(attributes, statement, delimiter);
-        return this.queryInformation;
+    protected SqlQueryInformation<UUID> constructStatement(String statement, String[] attributes, String delimiter) {
+        return this.queryFormatter.constructStatement(attributes, statement, delimiter);
     }
 
-    public ResultSet getResultSet(){
+    protected ResultSet getResultSet(){
         return this.queryExecutor.getResultSet();
     }
 
-    public void executeQuery() throws SQLException {
+    protected void executeQuery() throws SQLException {
         this.queryExecutor.executeQueryStatement(this.queryInformation);
     }
 
-    public int executeUpdate() throws SQLException {
+    protected int executeUpdate() throws SQLException {
         return this.queryExecutor.executeUpdateStatement(this.queryInformation);
     }
 
-    public void setExecutorDatabaseConnectionType(DatabaseConnection databaseConnectionType) {
-        this.queryExecutor.setDatabaseConnection(databaseConnectionType);
+    protected void setTableAttributes(TableAttributes tableAttributes){
+        this.tableAttributes = tableAttributes;
     }
 
-    public SqlQueryExecutor getQueryExecutor(){
+
+
+    protected SqlQueryExecutor getQueryExecutor(){
         return this.queryExecutor;
     }
 

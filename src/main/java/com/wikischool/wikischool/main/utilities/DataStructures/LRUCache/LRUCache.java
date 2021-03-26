@@ -94,7 +94,7 @@ public class LRUCache<K, V> implements LRUCacheInterface<K,V> {
 
     @Override
     public void put(K key, V value) {
-        LRUNode<K,V> update_node = (LRUNode)hash_map.get(key);
+        LRUNode<K,V> update_node = hash_map.get(key);
 
         if (update_node != null) { //Update the node
             remove(update_node);
@@ -114,7 +114,7 @@ public class LRUCache<K, V> implements LRUCacheInterface<K,V> {
 
         }
         //Add to front of list, and add to hash:
-        LRUNode new_node = new LRUNode<K,V>(key, value);
+        LRUNode new_node = new LRUNode<>(key, value);
         add_to_front(new_node);
         hash_map.put(key, new_node);
         elements++;
@@ -157,11 +157,9 @@ public class LRUCache<K, V> implements LRUCacheInterface<K,V> {
     public LRUNode<K,V> testGetCacheList(){
         return this.head.next;
     }
+
     public boolean isNodeTail(LRUNode<K,V> node){
-        if(tail.equals(node)){
-            return true;
-        }
-        return false;
+        return tail.equals(node);
     }
 
 }

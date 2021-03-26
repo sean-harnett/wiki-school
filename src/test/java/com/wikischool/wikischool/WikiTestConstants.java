@@ -7,11 +7,7 @@ package com.wikischool.wikischool;
  * @author sean-harnett
  */
 public abstract class WikiTestConstants {
-    /**
-     * Location of the properties file to test database connectivity.
-     */
-    //Files:
-    static final public String DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION = "src/main/java/com/wikischool/wikischool/databaseConnectionPropertiesFile.properties";
+
 
     //SQL:
     static final public String SQL_ALL = "*";
@@ -22,7 +18,8 @@ public abstract class WikiTestConstants {
     static final public String STUDENT_TABLE_UPDATE = "UPDATE SET";
 
     //String Formatter Test:
-    static final public String STRING_FORMATTING_STUDENT_RESULT_QUERY = "SELECT * FROM student";
+    static final public String STRING_FORMATTING_STUDENT_RESULT_QUERY = "SELECT * FROM student WHERE first_name = ?";
+    static final public String STRING_FORMATTING_STUDENT_RESULT_INSERT_QUERY = "INSERT INTO student (id,first_name,last_name) VALUES(?, ?, ?)";
 
 
     //Properties File:

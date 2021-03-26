@@ -1,6 +1,8 @@
 package com.wikischool.wikischool.main.utilities.StringFormatting;
 
 
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 
 /**
@@ -8,6 +10,7 @@ import java.util.ArrayList;
  *
  * @author sean-harnett
  */
+@Component
 public class StringFormatter implements StatementFormatter {
 
     private final ArrayList<Formatter_Node> formattingAttributes = new ArrayList<>();
@@ -32,6 +35,7 @@ public class StringFormatter implements StatementFormatter {
     public String constructNewString() {
 
         int attributesLength = this.formattingAttributes.size();
+
         StringBuilder builder = new StringBuilder(source);
 
         Formatter_Node currentAttributeNode;
@@ -41,14 +45,16 @@ public class StringFormatter implements StatementFormatter {
 
         for (int ix = 0; ix < attributesLength; ix++) {
             currentAttributeNode = this.formattingAttributes.get(ix);
-            currentAttribute = " " + currentAttributeNode.getAttribute(); // adds an extra space before the string
-            builder.insert((currentAttributeNode.getInsertionIndex() + addedLength), currentAttribute);
-            addedLength += (currentAttribute.length());
+
+            currentAttribute =  currentAttributeNode.getAttribute();
+
+            builder.insert((currentAttributeNode.getInsertionIndex() + addedLength), currentAttribute );
+
+            addedLength += (currentAttribute.length() -1); // subtract one for each delimiter that was originally in the string, because all the characters have shifted left by one.
         }
 
-        if (this.clearNodes) {
-            this.formattingAttributes.clear();
-        }
+        this.formattingAttributes.clear();
+
 
         return builder.toString();
 

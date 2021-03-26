@@ -27,29 +27,35 @@ public class QueryFormatter {
 
         SqlQueryInformation<UUID> information = new SqlQueryInformation<>();
 
-        information.setSqlStatement(this.baseStatement);
 
         for (int ix = 0; ix < length; ix++) {
+
             this.queryFormatter.addNewAttribute(attributes[ix], insertIndices[ix]);
         }
+        String strippedStatement = this.baseStatement.replaceAll(this.delimiter, "");
 
-        this.queryFormatter.setSource(this.baseStatement.replaceAll(this.delimiter, ""));
+        this.queryFormatter.setSource(strippedStatement);
+
+        information.setUnFormattedSqlStatement(strippedStatement);
 
         information.setFormattedSqlStatement(this.queryFormatter.constructNewString());
 
         this.queryInformation = information;
 
     }
+
     /**
      * Method called to construct an query that is ready to be prepared.
-     *  attributes.length must equal the amount of locations in the baseSqlStatement where the delimiter is used.
-     * @param attributes The attributes to insert
-     * @param baseSqlStatement  The foundational statement from which the statement is constructed. ie. SELECT FROM WHERE
-     * @param delimiter the character(as a String) to split on, so that nothing will be inserted in unintended locations.
+     * attributes.length must equal the amount of locations in the baseSqlStatement where the delimiter is used.
+     *
+     * @param attributes       The attributes to insert
+     * @param baseSqlStatement The foundational statement from which the statement is constructed. ie. SELECT FROM WHERE
+     * @param delimiter        the character(as a String) to split on, so that nothing will be inserted in unintended locations.
      */
-    public SqlQueryInformation<UUID> constructStatement(String[] attributes, String baseSqlStatement, String delimiter){
+    public SqlQueryInformation<UUID> constructStatement(String[] attributes, String baseSqlStatement, String delimiter) {
 
         this.delimiter = delimiter;
+        this.baseStatement = null;
         this.baseStatement = baseSqlStatement;
 
 
@@ -65,11 +71,14 @@ public class QueryFormatter {
 
     }
 
-    private int[] findInsertIndices(String[] targets, int length){
+    private int[] findInsertIndices(String[] targets, int length) {
         int[] indices = new int[length];
+        int previousIndex = 0;
+        for (int ix = 0; ix < length; ix++) {
 
-        for(int ix = 0; ix < length; ix++){
-            indices[ix] = this.baseStatement.indexOf(targets[ix]) + targets[ix].length();
+            indices[ix] = this.baseStatement.indexOf(targets[ix], previousIndex) + targets[ix].length();
+            previousIndex = indices[ix];
+
         }
 
         return indices;
@@ -79,14 +88,13 @@ public class QueryFormatter {
      * Set the current base statement to use to format a query. The statement should have delimiter characters.
      * Delimiters will be used to insert attributes into.
      * This statement contains no SQL placeholders, table names, or columns.
-     *  For example: "UPDATE % SET % WHERE" where '%' is an example delimiter
+     * For example: "UPDATE % SET % WHERE" where '%' is an example delimiter
+     *
      * @param baseSqlStatement String
      */
     public void setBaseStatement(String baseSqlStatement) {
         this.baseStatement = baseSqlStatement;
     }
-
-
 
 
 }

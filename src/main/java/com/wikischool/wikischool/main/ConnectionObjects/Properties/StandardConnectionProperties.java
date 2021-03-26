@@ -10,14 +10,15 @@ import com.wikischool.wikischool.main.utilities.EnumIndices.PropertiesAttributeI
 public interface StandardConnectionProperties {
     /**
      * Obtain a property as a string through a properties ENUM.
-     * @param targetProperty
+     * @param targetProperty property to retrieve the value of.
      * @return String of the property.
      */
-    public String getProperty(PropertiesAttributeIndex targetProperty);
+     String getProperty(PropertiesAttributeIndex targetProperty);
 
     /**
      * Obtain properties from somewhere and read them into memory.
      *
      */
-    public void loadAndReadProperties();
+     void loadAndReadProperties();
+
 }

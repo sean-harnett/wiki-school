@@ -16,12 +16,12 @@ import com.wikischool.wikischool.main.utilities.EnumIndices.StudentAttributeInde
  */
 public interface StandardQueries<K> {
 
-   public void insert(SqlQueryInformation<K> queryInformation);
+    void insert(SqlQueryInformation<K> queryInformation);
 
-    public void update(SqlQueryInformation<K> queryInformation);
+    void update(SqlQueryInformation<K> queryInformation);
 
-    public void delete(SqlQueryInformation<K> queryInformation);
+    void delete(SqlQueryInformation<K> queryInformation);
 
-    public void retrieve(SqlQueryInformation<K> queryInformation);
+    void retrieve(SqlQueryInformation<K> queryInformation);
 
 }

@@ -33,4 +33,5 @@ public abstract class DatabaseProperties {
     public void loadAndReadProperties() {
         this.connectionProperties.loadAndReadProperties();
     }
+
 }

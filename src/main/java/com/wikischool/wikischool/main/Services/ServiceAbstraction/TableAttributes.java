@@ -6,8 +6,8 @@ package com.wikischool.wikischool.main.Services.ServiceAbstraction;
  */
 public interface TableAttributes {
 
-    public int getColumnCount();
-    public String[] getColumns();
-    public String getTableName();
+     int getColumnCount();
+     String[] getColumns();
+     String getTableName();
 
 }

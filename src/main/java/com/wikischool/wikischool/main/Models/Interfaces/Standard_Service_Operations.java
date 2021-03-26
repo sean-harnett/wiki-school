@@ -1,7 +1,5 @@
 package com.wikischool.wikischool.main.Models.Interfaces;
 
-
-
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -14,10 +12,10 @@ import java.util.UUID;
  */
 public interface Standard_Service_Operations<ModelType, AttributesEnum> {
 
-    public boolean InsertIntoDataBase(ModelType entity);
-    public ModelType create(Map<AttributesEnum, Object> entityAttributes);
-    public boolean createAndInsertEntity(Map<AttributesEnum, Object> entityAttributes);
-    public boolean deleteById(UUID id);
-    public List<ModelType> retrieveAll();
+     boolean InsertIntoDataBase(ModelType entity);
+     ModelType create(Map<AttributesEnum, Object> entityAttributes);
+     boolean createAndInsertEntity(Map<AttributesEnum, Object> entityAttributes);
+     boolean deleteById(UUID id);
+     List<ModelType> retrieveAll();
 
 }

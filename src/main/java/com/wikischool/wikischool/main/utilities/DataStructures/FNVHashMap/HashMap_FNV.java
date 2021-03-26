@@ -27,7 +27,7 @@ public class HashMap_FNV<K, V> { // 32 bit integer hash
     private int element_count;
 
     private HashSet<K> keySet; //Contains map keys
-    private Bucket<K, V> map[];
+    private Bucket<K, V>[] map;
 
     //
     /**
@@ -46,7 +46,7 @@ public class HashMap_FNV<K, V> { // 32 bit integer hash
         this.map = new Bucket[given_capacity];
         this.entry_root = null;
         Arrays.fill(map, new Bucket<K, V>(null, null, null, null)); // initialize root buckets
-        this.keySet = new HashSet<K>(given_capacity);
+        this.keySet = new HashSet<>(given_capacity);
     }
 
     /**
@@ -72,7 +72,7 @@ public class HashMap_FNV<K, V> { // 32 bit integer hash
         }
         while (target.key != key) {
             if (target.next == null) {
-                target.next = new Bucket<K, V>(key, value, null, target);
+                target.next = new Bucket<>(key, value, null, target);
                 element_count++;
                 keySet.add(key);
                 return;
@@ -135,10 +135,7 @@ public class HashMap_FNV<K, V> { // 32 bit integer hash
      * @return boolean
      */
     public boolean isMapFull() {
-        if (this.element_count == capacity) {
-            return true;
-        }
-        return false;
+        return this.element_count == capacity;
     }
 
     /**
@@ -146,10 +143,7 @@ public class HashMap_FNV<K, V> { // 32 bit integer hash
      * @return boolean
      */
     public boolean isMapEmpty() {
-        if (this.element_count == MAP_EMPTY) {
-            return true;
-        }
-        return false;
+        return this.element_count == MAP_EMPTY;
     }
 
     /**
@@ -175,7 +169,7 @@ public class HashMap_FNV<K, V> { // 32 bit integer hash
      * @param key
      * @return Bucket type, corresponding to the head of the list of buckets where values are stored.
      */
-    private Bucket getTarget(K key) {
+    private Bucket<K,V> getTarget(K key) {
         int hash_key = hash(key.hashCode());
         this.entry_root = map[hash_key];
         return this.entry_root.next;
@@ -220,9 +214,7 @@ public class HashMap_FNV<K, V> { // 32 bit integer hash
 
         byte[] to_hash = buffer.array();
 
-        int key = hashFNV32(to_hash);
-
-        return key; //The new hash table key
+        return hashFNV32(to_hash); //The new hash table key
     }
 
     /**

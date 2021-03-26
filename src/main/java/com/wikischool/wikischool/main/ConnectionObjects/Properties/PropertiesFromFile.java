@@ -1,6 +1,8 @@
 package com.wikischool.wikischool.main.ConnectionObjects.Properties;
 
+import com.wikischool.wikischool.main.utilities.Constants.FileConstants;
 import com.wikischool.wikischool.main.utilities.EnumIndices.PropertiesAttributeIndex;
+import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -9,23 +11,23 @@ import java.util.Properties;
 
 /**
  *Class to obtain properties for database connection from database.
+ * TODO: create custom error for the interface, for when something goes wrong during loading and reading the properties.
  * @author sean-harnett
  */
-
+@Component("PropertiesFromFile")
 public class PropertiesFromFile implements StandardConnectionProperties {
 
     private Properties properties;
     private FileReader fileReader;
 
-    private String connectionPropertiesFileLocation;
+    private final String connectionPropertiesFileLocation = FileConstants.DATABASE_CONNECTION_PROPERTIES_FILE_LOCATION;
 
     /**
      * Main Constructor
-     * @param connectionPropertiesFileLocation the location of the properties file.
      */
-    public PropertiesFromFile(String connectionPropertiesFileLocation){
+    public PropertiesFromFile(){
         this.properties = new Properties();
-        this.connectionPropertiesFileLocation = connectionPropertiesFileLocation;
+
 
     }
     /**
@@ -37,6 +39,7 @@ public class PropertiesFromFile implements StandardConnectionProperties {
     public String getProperty(PropertiesAttributeIndex targetProperty) {
 
         return this.properties.getProperty(targetProperty.getProperty());
+
     }
 
     /**
@@ -73,4 +76,5 @@ public class PropertiesFromFile implements StandardConnectionProperties {
             throw new IOException(e);
         }
     }
+
 }

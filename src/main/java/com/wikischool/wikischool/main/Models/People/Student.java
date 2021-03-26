@@ -32,7 +32,7 @@ public class Student  {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.courses = new ArrayList<Course>(SizeConstants.DEFAULT_LIST_LENGTH);
+        this.courses = new ArrayList<>(SizeConstants.DEFAULT_LIST_LENGTH);
     }
 
     /**

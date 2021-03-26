@@ -1,15 +1,13 @@
 package com.wikischool.wikischool.main.utilities.DataStructures.LRUCache;
 
-import java.util.UUID;
-
 /**
  * interface to specify the LRU cache base functionality.
  * @author sean-harnett
  */
 public interface LRUCacheInterface<K, V> {
 
-    public V get(K key);
-    public void put(K key, V value); //Contains the full name of the student or instructor
-    public void cacheDelete(K key);
+     V get(K key);
+     void put(K key, V value); //Contains the full name of the student or instructor
+     void cacheDelete(K key);
 
 }

@@ -10,15 +10,13 @@ public class SqlQueryInformation<K> {
 
     private K primaryKey;
 
-    private String sqlStatement; // should be ready for table formatting
+    private String unFormattedSqlStatement; // should be ready for table formatting
 
     private String formattedSqlStatement; // Used to prepare the statement.
 
-    private String statementType;
 
     private Object[] recordAttributes;
 
-    private String[] formatValues; // stores values used to format the sql statement.
 
     private int[] attributeSqlColumnIndices; //Store the sql table column indices
 
@@ -39,21 +37,17 @@ public class SqlQueryInformation<K> {
         return recordAttributes != null;
     }
 
-    public String getSqlStatement() {
-        return sqlStatement;
-    }
+    public String getUnFormattedSqlStatement() { return this.unFormattedSqlStatement; }
 
-    public void setSqlStatement(String sqlStatement) {
-        this.sqlStatement = sqlStatement;
+    public void setUnFormattedSqlStatement(String sqlStatement) {
+        this.unFormattedSqlStatement = sqlStatement;
     }
 
     public K getPrimaryKey() {
         return primaryKey;
     }
 
-    public void setPrimaryKey(K primaryKey) {
-        this.primaryKey = primaryKey;
-    }
+    public void setPrimaryKey(K primaryKey) { this.primaryKey = primaryKey; }
 
     public Object[] getRecordAttributes() {
         return recordAttributes;
@@ -62,16 +56,6 @@ public class SqlQueryInformation<K> {
     public void setRecordAttributes(Object[] attributes) {
         this.recordAttributes = attributes;
     }
-
-    public String getStatementType() {
-        return this.statementType;
-    }
-
-    public void setStatementType(String type) {
-        this.statementType = type;
-    }
-
-
 
     public int[] getAttributeSqlColumnIndices() {
         return attributeSqlColumnIndices;
@@ -88,10 +72,5 @@ public class SqlQueryInformation<K> {
     public void setFormattedSqlStatement(String formattedSqlStatement) {
         this.formattedSqlStatement = formattedSqlStatement;
     }
-
-    public void setFormatValues(String[] formatValues){
-        this.formatValues = formatValues;
-    }
-
 
 }

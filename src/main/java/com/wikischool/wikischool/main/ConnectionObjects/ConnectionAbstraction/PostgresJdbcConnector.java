@@ -2,6 +2,9 @@ package com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction;
 
 import com.wikischool.wikischool.main.ConnectionObjects.Properties.StandardConnectionProperties;
 import com.wikischool.wikischool.main.utilities.EnumIndices.PropertiesAttributeIndex;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,6 +14,7 @@ import java.sql.SQLException;
  * jdbc connection dependant on postgresql.
  * @author sean-harnett
  */
+@Component("PostgresJdbcConnector")
 public class PostgresJdbcConnector implements JdbcConnector {
 
     StandardConnectionProperties connectionProperties;
@@ -23,12 +27,11 @@ public class PostgresJdbcConnector implements JdbcConnector {
     /**
      * Main Constructor
      */
-    public PostgresJdbcConnector() {
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            System.out.println(e);
-        }
+    @Autowired
+    public PostgresJdbcConnector(@Qualifier("PropertiesFromFile") StandardConnectionProperties connectionProperties){
+
+        this.connectionProperties = connectionProperties;
+
     }
 
     /**
@@ -56,7 +59,7 @@ public class PostgresJdbcConnector implements JdbcConnector {
 
     /**
      * Check if there is a connection, if yes, close it.
-     * @throws SQLException Exception occuring when trying to close connection.
+     * @throws SQLException Exception occurring when trying to close connection.
      */
 
     @Override
@@ -76,7 +79,7 @@ public class PostgresJdbcConnector implements JdbcConnector {
     }
     /**
      * Check whether a connection to a database has been made
-     * @return boolean conneciton = true, !connection = false
+     * @return boolean connection = true, !connection = false
      */
     @Override
     public boolean checkConnection() {
@@ -94,8 +97,7 @@ public class PostgresJdbcConnector implements JdbcConnector {
 
     @Override
     public String[] getSetProperties(){
-        String[] props = {userName, password, connectionUrl};
-        return  props;
+        return new String[]{userName, password, connectionUrl};
     }
 
     /**

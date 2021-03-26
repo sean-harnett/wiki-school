@@ -2,6 +2,8 @@ package com.wikischool.wikischool.main.Queries;
 
 import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.DatabaseConnection;
 import com.wikischool.wikischool.main.Models.Interfaces.QueryArchetype;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,6 +16,7 @@ import java.util.UUID;
  *
  * @author sean-harnett
  */
+@Service
 public class SqlQueryExecutor implements QueryArchetype<UUID> {
 
     private PreparedStatement preparedStatement;
@@ -22,7 +25,13 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
 
     private ResultSet resultSet;
 
-    public SqlQueryExecutor() {
+    @Autowired
+    public SqlQueryExecutor(DatabaseConnection dbConnection) {
+        this.databaseConnection = dbConnection;
+    }
+
+    public void readProperties(){
+        this.databaseConnection.readProperties();
     }
 
     /**
@@ -39,10 +48,15 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
         if (conn == null) {
             databaseConnection.establishConnection();
             conn = databaseConnection.getConnectionObject();
+
         }
         try {
+
             this.preparedStatement = conn.prepareStatement(queryInformation.getFormattedSqlStatement());
+
+
         } catch (SQLException e) {
+
             throw new SQLException(e);
         }
     }
@@ -57,6 +71,7 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
         try {
             int[] columnIndices = queryInformation.getAttributeSqlColumnIndices();
             Object[] attributes = queryInformation.getRecordAttributes();
+
             if (columnIndices != null && attributes != null) {
                 for (int ix = 0; ix < attributes.length; ix++) {
                     this.preparedStatement.setObject(columnIndices[ix], attributes[ix]);
@@ -78,6 +93,7 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
     public int executeUpdateStatement(SqlQueryInformation<UUID> queryInformation) throws SQLException {
         int effectedRecords;
         try {
+
             prepareSqlStatement(queryInformation);
             setAttributesToPreparedStatement(queryInformation);
 
@@ -116,11 +132,6 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
      */
     public ResultSet getResultSet() {
         return this.resultSet;
-    }
-
-    public void setDatabaseConnection(DatabaseConnection databaseConnection) {
-        this.databaseConnection = databaseConnection;
-
     }
 
 

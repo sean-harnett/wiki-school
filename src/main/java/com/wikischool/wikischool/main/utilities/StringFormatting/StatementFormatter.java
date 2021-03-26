@@ -9,13 +9,13 @@ package com.wikischool.wikischool.main.utilities.StringFormatting;
 public interface StatementFormatter {
 
 
-    public String constructNewString();
+     String constructNewString();
 
-    public void addNewAttribute(String attribute, int insertionIndex);
+     void addNewAttribute(String attribute, int insertionIndex);
 
-    public void setSource(String newSource);
+     void setSource(String newSource);
 
-    public String getSource();
+     String getSource();
 
 
 }

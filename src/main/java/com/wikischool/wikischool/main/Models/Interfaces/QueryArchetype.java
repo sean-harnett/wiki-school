@@ -6,8 +6,8 @@ import java.sql.SQLException;
 
 public interface QueryArchetype<K> {
 
-    public int executeUpdateStatement(SqlQueryInformation<K> queryInformation) throws SQLException;
+     int executeUpdateStatement(SqlQueryInformation<K> queryInformation) throws SQLException;
 
-    public void executeQueryStatement(SqlQueryInformation<K> queryInformation) throws SQLException;
+     void executeQueryStatement(SqlQueryInformation<K> queryInformation) throws SQLException;
 
 }
