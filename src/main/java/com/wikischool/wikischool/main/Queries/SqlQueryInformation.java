@@ -21,7 +21,10 @@ public class SqlQueryInformation<K> {
     private int[] attributeSqlColumnIndices; //Store the sql table column indices
 
 
-    public SqlQueryInformation() {}
+    public SqlQueryInformation() {
+        this.recordAttributes = null;
+        this.attributeSqlColumnIndices = null;
+    }
 
     public SqlQueryInformation(K primaryKey, String tableName, String[] attributes) {
         this.primaryKey = primaryKey;
@@ -61,6 +64,10 @@ public class SqlQueryInformation<K> {
         return attributeSqlColumnIndices;
     }
 
+    /**
+     * Set the statements column indices, these are where in the prepared statement to replace placeholder '?' characters- parallel to this.recordAttributes.
+     * @param attributeIndices integers
+     */
     public void setAttributeSqlColumnIndices(int[] attributeIndices) {
         this.attributeSqlColumnIndices = attributeIndices;
     }

@@ -25,22 +25,21 @@ public abstract class GeneralService {
 
     private SqlQueryExecutor queryExecutor;
 
-    private TableAttributes tableAttributes;
+
 
     private final QueryFormatter queryFormatter;
 
     protected SqlQueryInformation<UUID> queryInformation;
+    protected String delimiter;
 
-
-    public GeneralService(TableAttributes tableAttributes, StatementFormatter formatterType, SqlQueryExecutor executor) {
-
-        this.tableAttributes = tableAttributes;
+    public GeneralService( StatementFormatter formatterType, SqlQueryExecutor executor, String delimiter) {
+        this.delimiter = delimiter;
         this.queryFormatter = new QueryFormatter(formatterType);
         this.queryExecutor = executor;
     }
 
-    public GeneralService(TableAttributes tableAttributes, QueryFormatter queryFormatter, SqlQueryExecutor executor) {
-        this.tableAttributes = tableAttributes;
+    public GeneralService( QueryFormatter queryFormatter, SqlQueryExecutor executor, String delimiter) {
+        this.delimiter = delimiter;
         this.queryFormatter = queryFormatter;
         this.queryExecutor = executor;
     }
@@ -48,11 +47,11 @@ public abstract class GeneralService {
         this.queryExecutor.readProperties();
     }
 
-    protected SqlQueryInformation<UUID> constructStatement(String statement, String[] attributes, String delimiter) {
-        return this.queryFormatter.constructStatement(attributes, statement, delimiter);
+    protected SqlQueryInformation<UUID> constructStatement(String statement, String[] attributes) {
+        return this.queryFormatter.constructStatement(attributes, statement, this.delimiter);
     }
 
-    protected ResultSet getResultSet(){
+    public ResultSet getResultSet(){
         return this.queryExecutor.getResultSet();
     }
 
@@ -64,12 +63,18 @@ public abstract class GeneralService {
         return this.queryExecutor.executeUpdateStatement(this.queryInformation);
     }
 
-    protected void setTableAttributes(TableAttributes tableAttributes){
-        this.tableAttributes = tableAttributes;
+    public void closeAllDatabaseObjects()throws SQLException{
+        //this.queryInformation = null;
+        this.queryExecutor.closeAll();
     }
 
-
-
+    protected void resetQueryObject(){
+        this.queryInformation = null;
+    }
+    protected void resetQueryAttributes(){
+        this.queryInformation.setRecordAttributes(null);
+        this.queryInformation.setAttributeSqlColumnIndices(null);
+    }
     protected SqlQueryExecutor getQueryExecutor(){
         return this.queryExecutor;
     }

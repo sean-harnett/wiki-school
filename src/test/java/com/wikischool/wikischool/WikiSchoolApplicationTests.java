@@ -3,9 +3,6 @@ package com.wikischool.wikischool;
 import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.DatabaseConnection;
 import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.JdbcConnector;
 import com.wikischool.wikischool.main.ConnectionObjects.Properties.PropertiesFromFile;
-import com.wikischool.wikischool.main.Models.People.Student;
-import com.wikischool.wikischool.main.Queries.SqlQueryExecutor;
-import com.wikischool.wikischool.main.Services.StudentService.StudentService;
 import com.wikischool.wikischool.main.utilities.Constants.SizeConstants;
 import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache.LRUCache;
 import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache.LRUNode;
@@ -26,16 +23,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * This class is used to perform tests on the application.
  * TODO: write new tests to test queries, that execute without utilising a service object.
+ * TODO: extrapolate tests into specific test classes and files.
  * @author sean-harnett
  */
 class WikiSchoolApplicationTests {
 
 
     private DatabaseConnection connection;
-
-    @Autowired
-    private SqlQueryExecutor queryExecutor;
-
 
     /**
      * Test if the properties are read into the connection object correctly
@@ -79,63 +73,7 @@ class WikiSchoolApplicationTests {
     }
 
 
-    /**
-     * Test if LRUCache 'put' method implementation removes the least recently used element
-     */
-    @Test
-    public void TestLRUCache() {
-        LRUCache<Integer, Integer> cache = new LRUCache<>(SizeConstants.DEFAULT_CACHE_LENGTH);
-        int testArrayLength = 10;
-        int ix;
-        int[] arr = new int[testArrayLength];
-        for (ix = 0; ix < testArrayLength; ix++) { //Initialize test values
-            arr[ix] = ix;
-        }
-        System.out.println("<< Start fill cache to capacity>>");
-        LRUNode<Integer, Integer> list_reference;
-        for (ix = 0; ix < SizeConstants.DEFAULT_CACHE_LENGTH; ix++) { // Fill the cache
-            cache.put(arr[ix], arr[ix]);
-            list_reference = cache.testGetCacheList();
-            System.out.println("----------------");
-            while (!cache.isNodeTail(list_reference)) {
-                System.out.print("List Node value:");
-                System.out.println(list_reference.getValue());
-                System.out.println(" ");
-                list_reference = list_reference.next;
-            }
-            System.out.println("----------------");
-        }
-        System.out.println("<< End fill cache to capacity>>");
-        System.out.println();
-        //Adding another element should remove the entry value '0' from the Cache.
-        System.out.println("<< Start push cache beyond capacity>>");
-        cache.put(arr[ix], arr[ix]);
-        list_reference = cache.testGetCacheList();
-        System.out.println("----------------");
-        System.out.println();
-        while (!cache.isNodeTail(list_reference)) {
-            System.out.print("List Node value:");
-            System.out.println(list_reference.getValue());
-            System.out.println(" ");
-            list_reference = list_reference.next;
-        }
-        System.out.println("----------------");
-        System.out.println("<< End push cache beyond capacity>>");
 
-    }
-
-
-    @Test
-    public void TestStudentInsert(@Autowired StudentService studentService) {
-
-        Student student = studentService.createStudent("Test", "Name");
-        try {
-            studentService.insertStudentIntoDatabase(student);
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-
-    }
 
 
 }

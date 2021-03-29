@@ -55,9 +55,10 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
             this.preparedStatement = conn.prepareStatement(queryInformation.getFormattedSqlStatement());
 
 
+
         } catch (SQLException e) {
 
-            throw new SQLException(e);
+            throw e;
         }
     }
 
@@ -78,7 +79,7 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
                 }
             }
         } catch (SQLException e) {
-            throw new SQLException(e);
+            throw e;
         }
     }
 
@@ -100,7 +101,7 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
             effectedRecords = this.preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new SQLException(e.getMessage());
+          throw e;
         }
         return effectedRecords;
     }
@@ -120,7 +121,7 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
             this.resultSet = this.preparedStatement.executeQuery();
 
         } catch (SQLException e) {
-            throw new SQLException(e.getMessage());
+            throw e;
         }
     }
 
@@ -170,7 +171,7 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
         try {
             this.resultSet.close();
         } catch (SQLException e) {
-            throw new SQLException(e.getMessage());
+            throw e;
         }
     }
 
@@ -181,7 +182,7 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
         try {
             this.databaseConnection.closeConnection();
         } catch (SQLException e) {
-            throw new SQLException(e.getMessage());
+            throw e;
         }
     }
 
@@ -192,7 +193,7 @@ public class SqlQueryExecutor implements QueryArchetype<UUID> {
         try {
             this.preparedStatement.close();
         } catch (SQLException e) {
-            throw new SQLException(e.getMessage());
+            throw e;
         }
     }
 }
