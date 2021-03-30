@@ -10,7 +10,7 @@ import java.util.ArrayList;
  *
  * @author sean-harnett
  */
-@Component
+@Component("StringFormatter")
 public class StringFormatter implements StatementFormatter {
 
     private final ArrayList<Formatter_Node> formattingAttributes = new ArrayList<>();

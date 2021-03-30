@@ -25,7 +25,7 @@ public class QueryFormatter {
      */
     private void ConstructFormattedStatement(int[] insertIndices, String[] attributes, int length) {
 
-        SqlQueryInformation<UUID> information = new SqlQueryInformation<>();
+  //      SqlQueryInformation<UUID> information = new SqlQueryInformation<>();
 
 
         for (int ix = 0; ix < length; ix++) {
@@ -36,11 +36,9 @@ public class QueryFormatter {
 
         this.queryFormatter.setSource(strippedStatement);
 
-        information.setUnFormattedSqlStatement(strippedStatement);
+        this.queryInformation.setFormattedSqlStatement(this.queryFormatter.constructNewString());
 
-        information.setFormattedSqlStatement(this.queryFormatter.constructNewString());
-
-        this.queryInformation = information;
+        //this.queryInformation = information;
 
     }
 
@@ -52,11 +50,12 @@ public class QueryFormatter {
      * @param baseSqlStatement The foundational statement from which the statement is constructed. ie. SELECT FROM WHERE
      * @param delimiter        the character(as a String) to split on, so that nothing will be inserted in unintended locations.
      */
-    public SqlQueryInformation<UUID> constructStatement(String[] attributes, String baseSqlStatement, String delimiter) {
+    public void constructStatement(String[] attributes, String baseSqlStatement, String delimiter, SqlQueryInformation<UUID> queryInformation) {
 
         this.delimiter = delimiter;
         this.baseStatement = null;
         this.baseStatement = baseSqlStatement;
+        this.queryInformation = queryInformation;
 
 
         int length = attributes.length;
@@ -67,7 +66,7 @@ public class QueryFormatter {
 
         ConstructFormattedStatement(insertIndices, attributes, length);
 
-        return this.queryInformation;
+        //return this.queryInformation;
 
     }
 

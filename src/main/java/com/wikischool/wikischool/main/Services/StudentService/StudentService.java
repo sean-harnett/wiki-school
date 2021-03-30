@@ -5,7 +5,6 @@ import com.wikischool.wikischool.main.Queries.SqlQueryExecutor;
 import com.wikischool.wikischool.main.Queries.SqlQueryInformation;
 import com.wikischool.wikischool.main.Services.GeneralService;
 import com.wikischool.wikischool.main.utilities.Constants.SizeConstants;
-import com.wikischool.wikischool.main.utilities.Constants.StudentConstants.StudentFields;
 import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache.LRUCache;
 import com.wikischool.wikischool.main.utilities.StringFormatting.StringFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +18,8 @@ import java.util.UUID;
 
 /**
  * Class to work with student objects and their functionality
- * TODO: implement the rest of the student methods
+ * <p>
  * TODO: abstract SQL syntax.
- * TODO: abstract delete method, so that it will delete any related data in other tables also. For example, delete the course notes corresponding to student with id 'x'.
  *
  * @author sean-harnett
  */
@@ -30,8 +28,6 @@ import java.util.UUID;
 public class StudentService extends GeneralService {
 
     private final LRUCache<UUID, Student> studentCache = new LRUCache<>(SizeConstants.DEFAULT_CACHE_LENGTH);
-    private final String delimiter = "-";
-    private final int STUDENT_FIELD_COUNT = 3;
 
     @Autowired
     public StudentService(StringFormatter stringFormatter, SqlQueryExecutor executor) {
@@ -45,18 +41,22 @@ public class StudentService extends GeneralService {
 
     /**
      * Method to instantiate a student object.
+     *
      * @param firstName Students first name
-     * @param lastName Students last name
+     * @param lastName  Students last name
      * @return a new Student object populated with first name, last name, and an auto-generated ID field
      */
-    public Student createStudent(String firstName, String lastName) {
-
-        return new Student(newID(), firstName, lastName);
-
+    public Student createStudent(String firstName, String lastName, UUID id) {
+        if (id == null)
+            return null;
+        Student student = new Student(id, firstName, lastName);
+        this.studentCache.put(id, student);
+        return student;
     }
 
     /**
      * Insert one student into the database.
+     *
      * @param student the object, containing at least mandatory fields to populate a database record of type Student.
      * @throws SQLException
      */
@@ -70,7 +70,11 @@ public class StudentService extends GeneralService {
 
         String[] formatAttributes = {"id", "first_name", "last_name"};
 
-        this.queryInformation = this.constructStatement(nonformattedQuery, formatAttributes);
+        this.queryInformation.setUnFormattedSqlStatement(nonformattedQuery);
+
+        this.constructStatement(nonformattedQuery, formatAttributes);
+
+        System.out.println(this.queryInformation.getFormattedSqlStatement());
 
         Object[] queryValues = {id, firstName, lastName};
 
@@ -79,9 +83,19 @@ public class StudentService extends GeneralService {
         queryInformation.setRecordAttributes(queryValues);
         queryInformation.setAttributeSqlColumnIndices(columnIndices);
 
-        this.queryInformation = queryInformation;
 
-        this.executeUpdate();
+        try {
+            this.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        }
+
+        try {
+            this.closeAllDatabaseObjects();
+        } catch (SQLException e) {
+            throw e;
+        }
+        this.resetQueryAttributes();
 
         this.studentCache.put(id, student); // add the student to cache.
 
@@ -89,6 +103,7 @@ public class StudentService extends GeneralService {
 
     /**
      * Method that will select a single student from the database based off of ID.
+     *
      * @param targetStudentId UUID type, of the target student.
      * @return Student object
      * @throws SQLException
@@ -101,7 +116,7 @@ public class StudentService extends GeneralService {
             //Create the query:
             String nonformattedQuery = "SELECT - FROM student WHERE -";
             String[] formatAttributes = {"*", "id=?"};
-            this.queryInformation = this.constructStatement(nonformattedQuery, formatAttributes);
+            this.constructStatement(nonformattedQuery, formatAttributes);
 
             Object[] queryValues = {targetStudentId};
             int[] columnIndices = {1};
@@ -111,12 +126,15 @@ public class StudentService extends GeneralService {
 
             //Execute the query:
 
-            this.executeQuery(); // throws SQLException
-
+            try {
+                this.executeQuery();
+            } catch (SQLException e) {
+                throw e;
+            }
             ResultSet rs = this.getResultSet();
 
-            //Create the student object from the results
 
+            // If the result set retrieved anything, set the columns to corresponding student class members:
             if (rs.getFetchSize() > 0) {
 
                 UUID id = rs.getObject(1, UUID.class);
@@ -129,8 +147,12 @@ public class StudentService extends GeneralService {
                 this.studentCache.put(id, foundStudent);
 
             }
-
-            this.closeAllDatabaseObjects(); // throws SQLException
+            try {
+                this.closeAllDatabaseObjects(); // throws SQLException
+            } catch (SQLException e) {
+                throw e;
+            }
+            this.resetQueryAttributes(); // reset the queryInformation object
         }
 
         return foundStudent;
@@ -144,12 +166,15 @@ public class StudentService extends GeneralService {
      * @throws SQLException
      */
     public boolean deleteStudentByIdFromDataBase(UUID targetStudentId) throws SQLException {
+        if (targetStudentId == null)
+            return false;
 
-        String nonformattedQuery = "DELETE FROM student WHERE -";
+        String query = "DELETE FROM student WHERE id=?";
 
-        String[] formatAttributes = {"id=?"};
+        this.queryInformation.setUnFormattedSqlStatement(query);
+        this.queryInformation.setFormattedSqlStatement(query);
 
-        this.queryInformation = this.constructStatement(nonformattedQuery, formatAttributes);
+        int rowsAffected = 0;
 
         Object[] queryValues = {targetStudentId};
 
@@ -158,17 +183,31 @@ public class StudentService extends GeneralService {
         this.queryInformation.setRecordAttributes(queryValues);
 
         this.queryInformation.setAttributeSqlColumnIndices(columnIndices);
+        try {
 
-        int rowsAffected = this.executeUpdate();
+            rowsAffected = this.executeUpdate();
 
+            if (studentCache.checkCache(targetStudentId)) {
+                studentCache.cacheDelete(targetStudentId);
+            }
+
+        } catch (SQLException e) {
+            throw e;
+        }
+
+        try {
+            this.closeAllDatabaseObjects();
+        } catch (SQLException e) {
+            throw e;
+        }
         this.resetQueryAttributes(); // reset the information object for the next query
-
         return rowsAffected > 0; // boolean, whether any rows were affected
 
     }
 
     /**
      * Method that returns a list of all the students in the database.
+     *
      * @return List of type Student.
      * @throws SQLException
      */
@@ -179,33 +218,43 @@ public class StudentService extends GeneralService {
         this.queryInformation.setUnFormattedSqlStatement(query);
 
         this.queryInformation.setFormattedSqlStatement(query);
-        this.resetQueryAttributes();
 
-        this.executeQuery();
+        try {
+            this.executeQuery();
+        } catch (SQLException e) {
+            throw e;
+        }
 
         ResultSet rs = this.getResultSet();
-        List<Student> students = new ArrayList<Student>();
+        List<Student> students = new ArrayList<>();
 
         while (rs.next()) {
             students.add(new Student(rs.getObject(1, UUID.class), rs.getString(2), rs.getString(3)));
-
         }
-        this.closeAllDatabaseObjects();
+
+        try {
+            this.closeAllDatabaseObjects();
+        } catch (SQLException e) {
+            throw e;
+        }
+        this.resetQueryAttributes();
+
         return students;
 
     }
 
     /**
      * Method used to update a single student record by Id within a database.
+     *
      * @param student Object containing the values to update.
      * @return integer- rows affected, returns -1 when error occurs.
      * @throws SQLException
      */
-    public int updateStudentById(Student student) throws SQLException {
+    public boolean updateStudentById(Student student) throws SQLException {
 
 
         String nonformattedQuery = "UPDATE student SET - WHERE id=?";
-        int rowsAffected = -1; // -1 for error handling.
+        int rowsAffected = 0;
         this.resetQueryAttributes();
         this.queryInformation.setUnFormattedSqlStatement(nonformattedQuery);
 
@@ -248,25 +297,25 @@ public class StudentService extends GeneralService {
             columnIndices[1] = 2;
         }
 
-        this.queryInformation = this.constructStatement(nonformattedQuery, formatAttributes);
-        if(queryValues == null || columnIndices == null) { // is error return -1.
-            return rowsAffected;
+        this.constructStatement(nonformattedQuery, formatAttributes);
+
+        if (queryValues == null || columnIndices == null) { // is error return -1.
+            return rowsAffected > 0;
         }
-            this.queryInformation.setRecordAttributes(queryValues);
-            this.queryInformation.setAttributeSqlColumnIndices(columnIndices);
+        this.queryInformation.setRecordAttributes(queryValues);
+        this.queryInformation.setAttributeSqlColumnIndices(columnIndices);
+        try {
             rowsAffected = this.executeUpdate();
-
-        return rowsAffected;
+        } catch (SQLException e) {
+            throw e;
+        }
+        try {
+            this.closeAllDatabaseObjects();
+        } catch (SQLException e) {
+            throw e;
+        }
+        this.resetQueryAttributes();
+        return rowsAffected > 0;
 
     }
-
-    /**
-     * Helper method to return a new ID
-     * @return UUID to be used, generally, as a primary-key.
-     */
-    private UUID newID() {
-        return UUID.randomUUID();
-    }
-
-
 }

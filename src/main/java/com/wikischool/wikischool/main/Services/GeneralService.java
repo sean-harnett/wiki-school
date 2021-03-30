@@ -12,46 +12,43 @@ import java.util.UUID;
 
 /**
  * Class used to handle a database queries made by services.
+ *
+ * @author sean-harnett
  * @see TableAttributes
  * @see SqlQueryExecutor
  * @see QueryFormatter
  * @see SqlQueryInformation
  * TODO: setup the QueryFormatter to be autowired.
- * @author sean-harnett
- *
  */
 public abstract class GeneralService {
 
 
-    private SqlQueryExecutor queryExecutor;
-
-
-
     private final QueryFormatter queryFormatter;
-
+    private final SqlQueryExecutor queryExecutor;
     protected SqlQueryInformation<UUID> queryInformation;
     protected String delimiter;
 
-    public GeneralService( StatementFormatter formatterType, SqlQueryExecutor executor, String delimiter) {
+    public GeneralService(StatementFormatter formatterType, SqlQueryExecutor executor, String delimiter) {
         this.delimiter = delimiter;
         this.queryFormatter = new QueryFormatter(formatterType);
         this.queryExecutor = executor;
     }
 
-    public GeneralService( QueryFormatter queryFormatter, SqlQueryExecutor executor, String delimiter) {
+    public GeneralService(QueryFormatter queryFormatter, SqlQueryExecutor executor, String delimiter) {
         this.delimiter = delimiter;
         this.queryFormatter = queryFormatter;
         this.queryExecutor = executor;
     }
-    protected void readProperties(){
+
+    protected void readProperties() {
         this.queryExecutor.readProperties();
     }
 
-    protected SqlQueryInformation<UUID> constructStatement(String statement, String[] attributes) {
-        return this.queryFormatter.constructStatement(attributes, statement, this.delimiter);
+    protected void constructStatement(String statement, String[] attributes) {
+        this.queryFormatter.constructStatement(attributes, statement, this.delimiter, this.queryInformation);
     }
 
-    public ResultSet getResultSet(){
+    public ResultSet getResultSet() {
         return this.queryExecutor.getResultSet();
     }
 
@@ -63,19 +60,26 @@ public abstract class GeneralService {
         return this.queryExecutor.executeUpdateStatement(this.queryInformation);
     }
 
-    public void closeAllDatabaseObjects()throws SQLException{
+    public void closeAllDatabaseObjects() throws SQLException {
         //this.queryInformation = null;
         this.queryExecutor.closeAll();
     }
 
-    protected void resetQueryObject(){
+    protected void resetQueryObject() {
         this.queryInformation = null;
     }
-    protected void resetQueryAttributes(){
+
+    /**
+     * Sets the queryInformation Object's recordAttributes, and columnIndices arrays to null.
+     *
+     * @see SqlQueryInformation
+     */
+    protected void resetQueryAttributes() {
         this.queryInformation.setRecordAttributes(null);
         this.queryInformation.setAttributeSqlColumnIndices(null);
     }
-    protected SqlQueryExecutor getQueryExecutor(){
+
+    protected SqlQueryExecutor getQueryExecutor() {
         return this.queryExecutor;
     }
 

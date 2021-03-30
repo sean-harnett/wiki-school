@@ -26,7 +26,7 @@ public class StudentTests {
     @Test
     public void TestStudentInsert(@Autowired StudentService studentService) {
 
-        Student student = studentService.createStudent("Test", "Name");
+        Student student = studentService.createStudent("Test", "Name", UUID.fromString(WikiTestConstants.TEST_STUDENT_ID));
         try {
             studentService.insertStudentIntoDatabase(student);
         } catch (SQLException e) {
@@ -122,7 +122,7 @@ public class StudentTests {
         UUID id = UUID.fromString(WikiTestConstants.TEST_STUDENT_ID);
         Student studentFieldsToUpdate = new Student(id,"New", "Name");
         try{
-            int rowsAffected = studentService.updateStudentById(studentFieldsToUpdate);
+            boolean rowsAffected = studentService.updateStudentById(studentFieldsToUpdate);
             System.out.println(rowsAffected);
         }catch(SQLException e){
             System.out.println(e);
