@@ -4,6 +4,9 @@ package com.wikischool.wikischool.main.utilities.DataStructures.LRUCache;
 import com.wikischool.wikischool.main.utilities.DataStructures.FNVHashMap.FNVMap;
 import com.wikischool.wikischool.main.utilities.DataStructures.FNVHashMap.HashMapFNV;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Implementation of a Least Recently Used (LRU) cache.
  * The LRU cache determines what entries can be deleted based on how relevant they are.
@@ -121,7 +124,6 @@ public class LRUCache<K, V> implements Cache<K, V> {
         if (!this.checkIfCacheContainsKey(key)) {
             return false;
         }
-        System.out.println("Does Cache Contain Key:" + this.lruMap.containsKey(key));
         LruNode<K, V> cacheNode = this.lruMap.get(key);
 
         this.removeFromCacheList(cacheNode); //detach it from list.
@@ -182,7 +184,20 @@ public class LRUCache<K, V> implements Cache<K, V> {
         return this.cacheHead;
     }
 
-    public class LruNode<Key, Value> {
+    public List<V> getListOfCacheValues() {
+
+        List<V> values = new ArrayList<V>(this.size);
+        LruNode<K, V> list = this.cacheHead.next;
+
+        while (list.value != null) {
+            values.add(list.value);
+            list = list.next;
+        }
+
+        return values;
+    }
+
+    private class LruNode<Key, Value> {
 
         protected Key key;
         protected Value value;
@@ -195,14 +210,6 @@ public class LRUCache<K, V> implements Cache<K, V> {
         }
 
         public LruNode() {
-        }
-
-        public LruNode getNext() {
-            return this.next;
-        }
-
-        public Value getValue() {
-            return this.value;
         }
     }
 

@@ -102,7 +102,6 @@ public class StudentTests {
         } catch (SQLException e) {
             System.out.println(e);
         }
-
         for (Student student : students) {
 
             System.out.println("\t { ");

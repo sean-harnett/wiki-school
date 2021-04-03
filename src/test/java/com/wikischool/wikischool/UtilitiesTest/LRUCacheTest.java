@@ -5,6 +5,8 @@ import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache.LRUCache
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 @SpringBootTest
 public class LRUCacheTest {
 
@@ -20,12 +22,12 @@ public class LRUCacheTest {
 
         for (int ix = 0; ix < testKeys.length; ix++) {
             this.cache.putIntoCache(testKeys[ix], testValues[ix]);
-            LRUCache.LruNode listHead = this.cache.getCacheHead();
+            List<Integer> values = this.cache.getListOfCacheValues();
 
             System.out.println("-------------------");
-            while (listHead.getNext().getValue() != null) {
-                listHead = listHead.getNext();
-                System.out.println("Node value: " + listHead.getValue());
+            for (int v : values) {
+
+                System.out.println("Value: " + v);
 
             }
             System.out.println("-------------------");
@@ -47,18 +49,21 @@ public class LRUCacheTest {
             System.out.print("Getting Key: " + testKeys[ix]);
             try {
                 this.cache.getFromCache(testKeys[ix]);
-            }catch (IllegalStateException e){
+            } catch (IllegalStateException e) {
 
-                System.out.println("\n"+e.getMessage());
+                System.out.println("\n" + e.getMessage());
 
             }
-            LRUCache.LruNode listHead = this.cache.getCacheHead();
-            System.out.println("\n-------------------");
-            while (listHead.getNext().getValue() != null) {
-                listHead = listHead.getNext();
-                System.out.println("Node value: " + listHead.getValue());
+            List<Integer> values = this.cache.getListOfCacheValues();
+
+            System.out.println("-------------------");
+            for (int v : values) {
+
+                System.out.println("Value: " + v);
+
             }
             System.out.println("-------------------");
+
         }
     }
 
@@ -76,15 +81,16 @@ public class LRUCacheTest {
         System.out.println("-------------------");
         for (int ix = 0; ix < testKeys.length; ix++) {
             System.out.println("Removing key: " + testKeys[ix]);
+
             this.cache.removeFromCache(testKeys[ix]);
 
-            LRUCache.LruNode listHead = this.cache.getCacheHead();
-            System.out.println("-------------------");
-            while (listHead.getNext().getValue() != null) {
-                listHead = listHead.getNext();
-                System.out.println("Node value: " + listHead.getValue());
+            List<Integer> values = this.cache.getListOfCacheValues();
 
+            System.out.println("-------------------");
+            for (Integer v : values) {
+                System.out.println("Value: " + v.intValue());
             }
+
             System.out.println("-------------------");
         }
 
