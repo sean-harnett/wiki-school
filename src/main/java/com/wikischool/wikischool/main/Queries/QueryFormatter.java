@@ -25,8 +25,6 @@ public class QueryFormatter {
      */
     private void ConstructFormattedStatement(int[] insertIndices, String[] attributes, int length) {
 
-  //      SqlQueryInformation<UUID> information = new SqlQueryInformation<>();
-
 
         for (int ix = 0; ix < length; ix++) {
 
@@ -38,7 +36,6 @@ public class QueryFormatter {
 
         this.queryInformation.setFormattedSqlStatement(this.queryFormatter.constructNewString());
 
-        //this.queryInformation = information;
 
     }
 
@@ -66,7 +63,6 @@ public class QueryFormatter {
 
         ConstructFormattedStatement(insertIndices, attributes, length);
 
-        //return this.queryInformation;
 
     }
 

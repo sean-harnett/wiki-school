@@ -56,7 +56,7 @@ public class NoteService extends GeneralService {
         Note note = new Note(title, textBody, id);
         note.setTimeLastUpdated(LocalDateTime.now());
 
-        this.noteCache.put(id, note); // add the new Note to cache
+        this.noteCache.putIntoCache(id, note); // add the new Note to cache
         return note;
 
     }
@@ -95,7 +95,7 @@ public class NoteService extends GeneralService {
 
         int rowsAffected = this.executeUpdate();
 
-        noteCache.put(id, note);
+        noteCache.putIntoCache(id, note);
 
         return rowsAffected > 0;
 
@@ -114,8 +114,8 @@ public class NoteService extends GeneralService {
 
         Note foundNote = null;
 
-        if (this.noteCache.checkCache(targetNoteId)) { // if the note was recently put into the cache
-            foundNote = this.noteCache.get(targetNoteId);
+        if (this.noteCache.checkIfCacheContainsKey(targetNoteId)) { // if the note was recently put into the cache
+            foundNote = this.noteCache.getFromCache(targetNoteId);
         } else { //Query the database.
             String nonformattedQuery = "SELECT - FROM note WHERE id=?";
             String[] formatAttributes = {"title,text_body"};
@@ -144,7 +144,7 @@ public class NoteService extends GeneralService {
                 String textBody = rs.getString(3);
 
                 foundNote = new Note(title, textBody, targetNoteId);
-                this.noteCache.put(targetNoteId, foundNote);
+                this.noteCache.putIntoCache(targetNoteId, foundNote);
             }
             this.resetQueryAttributes(); // reset the queryInformation object
             this.closeAllDatabaseObjects();
@@ -173,10 +173,9 @@ public class NoteService extends GeneralService {
         } catch (SQLException e) {
             throw e;
         }
-        if (this.noteCache.checkCache(targetNoteId)) {
-            this.noteCache.cacheDelete(targetNoteId); // remove the entry from the cache completely.
+        if (this.noteCache.checkIfCacheContainsKey(targetNoteId)) {
+            this.noteCache.removeFromCache(targetNoteId); // remove the entry from the cache completely.
         }
-
 
         try {
             this.closeAllDatabaseObjects();

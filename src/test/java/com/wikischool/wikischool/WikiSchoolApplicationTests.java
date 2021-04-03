@@ -3,9 +3,6 @@ package com.wikischool.wikischool;
 import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.DatabaseConnection;
 import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.JdbcConnector;
 import com.wikischool.wikischool.main.ConnectionObjects.Properties.PropertiesFromFile;
-import com.wikischool.wikischool.main.utilities.Constants.SizeConstants;
-import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache.LRUCache;
-import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache.LRUNode;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,9 +68,6 @@ class WikiSchoolApplicationTests {
         assertThat(this.connection.checkConnection()).isEqualTo(true);
 
     }
-
-
-
 
 
 }

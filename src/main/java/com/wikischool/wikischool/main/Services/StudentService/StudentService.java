@@ -50,7 +50,7 @@ public class StudentService extends GeneralService {
         if (id == null)
             return null;
         Student student = new Student(id, firstName, lastName);
-        this.studentCache.put(id, student);
+        this.studentCache.putIntoCache(id, student);
         return student;
     }
 
@@ -74,8 +74,6 @@ public class StudentService extends GeneralService {
 
         this.constructStatement(nonformattedQuery, formatAttributes);
 
-        System.out.println(this.queryInformation.getFormattedSqlStatement());
-
         Object[] queryValues = {id, firstName, lastName};
 
         int[] columnIndices = {1, 2, 3};
@@ -97,7 +95,7 @@ public class StudentService extends GeneralService {
         }
         this.resetQueryAttributes();
 
-        this.studentCache.put(id, student); // add the student to cache.
+        this.studentCache.putIntoCache(id, student);
 
     }
 
@@ -110,8 +108,9 @@ public class StudentService extends GeneralService {
      */
     public Student selectStudentByIdFromDatabase(UUID targetStudentId) throws SQLException {
         Student foundStudent = null;
-        if (this.studentCache.checkCache(targetStudentId)) {
-            foundStudent = this.studentCache.get(targetStudentId);
+
+        if (this.studentCache.checkIfCacheContainsKey(targetStudentId)) {
+            foundStudent = this.studentCache.getFromCache(targetStudentId);
         } else {
             //Create the query:
             String nonformattedQuery = "SELECT - FROM student WHERE -";
@@ -144,7 +143,7 @@ public class StudentService extends GeneralService {
                 foundStudent = new Student(id, firstName, lastName);
 
                 // Add the student to cache.
-                this.studentCache.put(id, foundStudent);
+                this.studentCache.putIntoCache(id, foundStudent);
 
             }
             try {
@@ -166,8 +165,9 @@ public class StudentService extends GeneralService {
      * @throws SQLException
      */
     public boolean deleteStudentByIdFromDataBase(UUID targetStudentId) throws SQLException {
-        if (targetStudentId == null)
+        if (targetStudentId == null) {
             return false;
+        }
 
         String query = "DELETE FROM student WHERE id=?";
 
@@ -187,9 +187,10 @@ public class StudentService extends GeneralService {
 
             rowsAffected = this.executeUpdate();
 
-            if (studentCache.checkCache(targetStudentId)) {
-                studentCache.cacheDelete(targetStudentId);
+            if (studentCache.checkIfCacheContainsKey(targetStudentId)) {
+                studentCache.removeFromCache(targetStudentId);
             }
+
 
         } catch (SQLException e) {
             throw e;
@@ -262,41 +263,54 @@ public class StudentService extends GeneralService {
         UUID targetId = student.getId();
         String firstName = student.getFirstName();
         String lastName = student.getLastName();
+
         Object[] queryValues = null;
         int[] columnIndices = null;
 
-        if (student.getFirstName() != null && student.getLastName() != null) { // Three possibilities for update:
 
-            formatAttributes[0] = "first_name=?,last_name=?";
-            queryValues = new Object[3];
-            columnIndices = new int[3];
-            queryValues[0] = firstName;
-            queryValues[1] = lastName;
-            queryValues[2] = targetId;
-            columnIndices[0] = 1;
-            columnIndices[1] = 2;
-            columnIndices[2] = 3;
+        int size = 1;
+        Object[] potentialValues = new Object[3];
+        int[] potentialIndices = new int[3];
+        potentialValues[2] = targetId;
 
-        } else if (firstName == null || firstName.length() < 1) {
+        StringBuilder queryBuilder = new StringBuilder();
 
-            formatAttributes[0] = "last_name=?";
-            queryValues = new Object[2];
-            columnIndices = new int[2];
-            queryValues[0] = lastName;
-            queryValues[1] = targetId;
-            columnIndices[0] = 1;
-            columnIndices[1] = 2;
-        } else if (lastName == null || lastName.length() < 1) {
-
-            formatAttributes[0] = "first_name=?";
-            queryValues = new Object[2];
-            columnIndices = new int[2];
-            queryValues[0] = firstName;
-            queryValues[1] = targetId;
-            columnIndices[0] = 1;
-            columnIndices[1] = 2;
+        if (firstName != null) {
+            queryBuilder.append("first_name=?");
+            potentialValues[0] = firstName;
+            potentialIndices[0] = 1;
+            size++;
         }
 
+        if (lastName != null) {
+            if (size > 0) {
+                queryBuilder.append(",last_name=?");
+                potentialIndices[1] = 2;
+                potentialIndices[2] = 3;
+            } else {
+                queryBuilder.append("last_name=?");
+                potentialIndices[0] = 1;
+                potentialIndices[1] = 2;
+            }
+
+            potentialValues[1] = lastName;
+            size++;
+        }
+
+        queryValues = new Object[size];
+        columnIndices = new int[size];
+
+        for (int ix = 0; ix < potentialValues.length; ix++) {
+
+            if (potentialValues[ix] != null) {
+                queryValues[ix] = potentialValues[ix];
+                columnIndices[ix] = potentialIndices[ix];
+            }
+            if (potentialIndices[ix] > 0) {
+                columnIndices[ix] = potentialIndices[ix];
+            }
+        }
+        formatAttributes[0] = queryBuilder.toString();
         this.constructStatement(nonformattedQuery, formatAttributes);
 
         if (queryValues == null || columnIndices == null) { // is error return -1.
@@ -315,6 +329,8 @@ public class StudentService extends GeneralService {
             throw e;
         }
         this.resetQueryAttributes();
+        if (rowsAffected > 0)
+            this.studentCache.putIntoCache(targetId, student);
         return rowsAffected > 0;
 
     }

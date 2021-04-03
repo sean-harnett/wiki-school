@@ -30,12 +30,12 @@ public class StudentTests {
         try {
             studentService.insertStudentIntoDatabase(student);
         } catch (SQLException e) {
-            System.out.println(e);
+            System.out.println("Error in Insert: " + e);
         }
         try {
             studentService.closeAllDatabaseObjects();
         }catch(SQLException e){
-            System.out.println(e);
+            System.out.println("Error Closing Objects: " + e);
         }
 
     }
@@ -77,7 +77,7 @@ public class StudentTests {
             System.out.println(e);
         }
         if (foundStudent != null) {
-            assertThat(foundStudent.getId()).isEqualTo(WikiTestConstants.TEST_STUDENT_ID);
+            assertThat(foundStudent.getId()).isEqualTo(UUID.fromString(WikiTestConstants.TEST_STUDENT_ID));
         }
         try {
             studentService.closeAllDatabaseObjects();
@@ -102,6 +102,7 @@ public class StudentTests {
         } catch (SQLException e) {
             System.out.println(e);
         }
+
         for (Student student : students) {
 
             System.out.println("\t { ");
