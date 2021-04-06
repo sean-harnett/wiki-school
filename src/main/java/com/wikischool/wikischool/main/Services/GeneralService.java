@@ -87,14 +87,14 @@ public abstract class GeneralService {
 
     /**
      * Method createQueryIndexAttributes is used to find what fields need to be updated, and the location of their placeholder in an update query.
-     * Also sets these values to corresponding arrays as paramaters: potentialIndices, and potentialValues.
+     * Also sets these values to corresponding arrays as parameters: potentialIndices, and potentialValues.
      *
      * @param potentialFields  fields to check for values of.
      * @param primaryKey       the primary key for the record.*
-     * @param potentialIndices where to store the newColumnIndices when found.
-     * @param potentialValues  where to store the new values to update with when found.
+     * @param potentialIndices where to store the corresponding column indices when found.
+     * @param potentialValues  where to store the new column values to update with when found.
      * @param queryBuilder     the string builder used to concatenate the proper amount of fields of the form "id=?".
-     * @param fieldStrings     the string values of fields, if to add to queryBuilder if they exist in the potentialFields, of the form "title=?".
+     * @param fieldStrings     the string values of fields to add to queryBuilder, if they exist in the potentialFields. Of the form "title=?".
      */
     protected int createQueryIndexAttributes(Object[] potentialFields, Object primaryKey, int[] potentialIndices, Object[] potentialValues, StringBuilder queryBuilder, String[] fieldStrings) {
 
