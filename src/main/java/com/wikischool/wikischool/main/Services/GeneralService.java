@@ -8,6 +8,8 @@ import com.wikischool.wikischool.main.utilities.StringFormatting.StatementFormat
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -81,6 +83,66 @@ public abstract class GeneralService {
 
     protected SqlQueryExecutor getQueryExecutor() {
         return this.queryExecutor;
+    }
+
+    /**
+     * Method createQueryIndexAttributes is used to find what fields need to be updated, and the location of their placeholder in an update query.
+     * Also sets these values to corresponding arrays as paramaters: potentialIndices, and potentialValues.
+     *
+     * @param potentialFields  fields to check for values of.
+     * @param primaryKey       the primary key for the record.*
+     * @param potentialIndices where to store the newColumnIndices when found.
+     * @param potentialValues  where to store the new values to update with when found.
+     * @param queryBuilder     the string builder used to concatenate the proper amount of fields of the form "id=?".
+     * @param fieldStrings     the string values of fields, if to add to queryBuilder if they exist in the potentialFields, of the form "title=?".
+     */
+    protected int createQueryIndexAttributes(Object[] potentialFields, Object primaryKey, int[] potentialIndices, Object[] potentialValues, StringBuilder queryBuilder, String[] fieldStrings) {
+
+        int length = potentialFields.length;
+
+        int[] stringIndices = new int[fieldStrings.length];
+        Arrays.fill(stringIndices, 0);
+        int iy = 0; // index to assign the values to.
+        int placeholderIndex = 1; // location of the placeholder in the query.
+        boolean populated = false;
+
+        for (int ix = 0; ix < length; ix++) {
+
+            if (!Objects.isNull(potentialFields[ix])) {
+
+                potentialValues[iy] = potentialFields[ix];
+                potentialIndices[iy] = placeholderIndex;
+                stringIndices[ix] = 1;
+
+                iy++;
+                placeholderIndex++;
+
+                populated = true; // at least one field was found.
+
+            }
+        }
+
+        potentialValues[iy] = primaryKey; // guarantee the primaryKey is at the last index
+        potentialIndices[iy] = placeholderIndex;
+
+        if (populated) {
+            int iz = 0;
+            while (stringIndices[iz] == 0) { // skipp the consecutive elements that won't need to be appended
+                ++iz;
+            }
+
+            queryBuilder.append(fieldStrings[iz]);
+
+            iz++;
+
+            for (; iz < stringIndices.length; iz++) {
+                if (stringIndices[iz] != 0) {
+                    queryBuilder.append(("," + " " + fieldStrings[iz]));
+                }
+            }
+            return iy; //number of fields found.
+        }
+        return -1; // no fields were found.
     }
 
 }

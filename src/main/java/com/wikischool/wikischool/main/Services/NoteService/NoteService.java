@@ -9,6 +9,7 @@ import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache.LRUCache
 import com.wikischool.wikischool.main.utilities.StringFormatting.StatementFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,14 +26,15 @@ import java.util.UUID;
  * @author sean-harnett
  * @see com.wikischool.wikischool.main.Services.StudentService.StudentService
  */
+@Service
 public class NoteService extends GeneralService {
 
     private final LRUCache<UUID, Note> noteCache = new LRUCache<>(SizeConstants.DEFAULT_CACHE_LENGTH);
 
     @Autowired
-    public NoteService(@Qualifier("StringFormatter") StatementFormatter formatterType, SqlQueryExecutor executor, String delimiter) {
+    public NoteService(@Qualifier("StringFormatter") StatementFormatter formatterType, SqlQueryExecutor executor) {
 
-        super(formatterType, executor, delimiter);
+        super(formatterType, executor, "-");
 
         this.queryInformation = new SqlQueryInformation<>();
 
@@ -222,6 +224,81 @@ public class NoteService extends GeneralService {
         }
         return notes;
 
+    }
+
+
+    /**
+     * Method to update a specific note record in the database, by primary key UUID
+     *
+     * @param note object containing the updated values for the object, and an id to identify record to update.
+     * @return boolean - true = note record updated, false = note record was not updated.
+     * @throws SQLException
+     * @throws IllegalStateException thrown when note object given is null, or note.getId() returns null.
+     */
+    public boolean updateNoteById(Note note) throws SQLException, IllegalStateException, IllegalArgumentException {
+
+
+        if (note == null) {
+            throw new IllegalArgumentException("Error in method 'updateNoteById': 'note' object cannot be null.");
+        }
+        if (note.getId() == null) {
+            throw new IllegalStateException("Error in method 'updateNoteById': 'Id' field of 'note' cannot be null.");
+        }
+
+        int rowsAffected = 0;
+
+        String nonformattedQuery = "UPDATE note SET - WHERE id=?";
+        this.resetQueryAttributes();
+        this.queryInformation.setUnFormattedSqlStatement(nonformattedQuery);
+
+        LocalDateTime updateTime = LocalDateTime.now();
+        String title = note.getTitle();
+        String textBody = note.getTextBody();
+
+        String[] formatAttributes = new String[1];
+        UUID targetId = note.getId();
+
+        Object[] fields = {note.getTitle(), note.getTextBody()}; // some may be null.
+
+        String[] potentialQueryFields = {"title=?", "text_body=?"};
+
+        Object[] potentialValues = new Object[3];
+        int[] potentialIndices = new int[3];
+
+        StringBuilder queryBuilder = new StringBuilder();
+
+        int size = this.createQueryIndexAttributes(fields, targetId, potentialIndices, potentialValues, queryBuilder, potentialQueryFields);
+
+
+        if (size == -1) {
+            throw new IllegalStateException("Error: no fields were provided to method: updateNoteById");
+        }
+
+        boolean populated = false;
+
+        formatAttributes[0] = queryBuilder.toString();
+        this.constructStatement(nonformattedQuery, formatAttributes);
+
+
+        this.queryInformation.setRecordAttributes(potentialValues);
+        this.queryInformation.setAttributeSqlColumnIndices(potentialIndices);
+
+
+        try {
+            rowsAffected = this.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        }
+
+        try {
+            this.closeAllDatabaseObjects();
+        } catch (SQLException e) {
+            throw e;
+        }
+
+        this.resetQueryAttributes();
+
+        return rowsAffected > 0;
     }
 
 }

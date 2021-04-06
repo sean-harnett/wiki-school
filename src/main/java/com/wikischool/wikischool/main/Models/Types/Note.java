@@ -20,16 +20,23 @@ public class Note {
 
 
     public Note(String title, String textBody, LocalDateTime timeLastUpdated, List<String> internetResources) {
+
         this.title = title;
         this.textBody = textBody;
         this.timeLastUpdated = timeLastUpdated;
         this.internetResources = internetResources;
+
     }
 
     public Note(String title, String textBody, UUID id) {
         this.id = id;
         this.title = title;
         this.textBody = textBody;
+    }
+    public Note(String textBody, UUID id){
+        this.title = null;
+        this.textBody = textBody;
+        this.id = id;
     }
 
     public String getTitle() {

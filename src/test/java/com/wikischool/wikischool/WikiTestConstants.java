@@ -27,6 +27,9 @@ public abstract class WikiTestConstants {
     static final public String PROPERTY_PASSWORD = "--password--";
     static final public String PROPERTY_URL = "jdbc:postgresql://localhost:5432/test";
 
+    //Note:
+    static final public String TEST_NOTE_ID = "e7291d47-53df-43cd-a629-785365d9912a";
+
     //Student:
     static final public String ID_FIELD = "id";
     static final public String STUDENT_COLUMN_FIRST_NAME = "first_name";

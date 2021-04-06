@@ -4,10 +4,8 @@ import com.wikischool.wikischool.WikiTestConstants;
 import com.wikischool.wikischool.main.Models.People.Student;
 import com.wikischool.wikischool.main.Services.StudentService.StudentService;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -21,6 +19,7 @@ public class StudentTests {
 
     /**
      * Test Method used to test the StudentService Ability to insert one student into the database.
+     *
      * @param studentService
      */
     @Test
@@ -34,7 +33,7 @@ public class StudentTests {
         }
         try {
             studentService.closeAllDatabaseObjects();
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println("Error Closing Objects: " + e);
         }
 
@@ -42,6 +41,7 @@ public class StudentTests {
 
     /**
      * Test if the Student service can delete a student using an ID.
+     *
      * @param studentService
      */
     @Test
@@ -57,7 +57,7 @@ public class StudentTests {
         assertThat(didDelete).isEqualTo(false);
         try {
             studentService.closeAllDatabaseObjects();
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e);
         }
 
@@ -65,6 +65,7 @@ public class StudentTests {
 
     /**
      * Test Student Service methods used to select a student by an ID from the database.
+     *
      * @param studentService
      */
     @Test
@@ -81,7 +82,7 @@ public class StudentTests {
         }
         try {
             studentService.closeAllDatabaseObjects();
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e);
         }
 
@@ -89,6 +90,7 @@ public class StudentTests {
 
     /**
      * Method testing if the student service can return a complete list of all students present in the database.
+     *
      * @param studentService
      */
 
@@ -115,21 +117,22 @@ public class StudentTests {
 
     /**
      * Tests if the student service will update a single student record.
+     *
      * @param studentService
      */
     @Test
-    public void TestUpdateStudent(@Autowired StudentService studentService){
+    public void TestUpdateStudent(@Autowired StudentService studentService) {
         UUID id = UUID.fromString(WikiTestConstants.TEST_STUDENT_ID);
-        Student studentFieldsToUpdate = new Student(id,"New", "Name");
-        try{
+        Student studentFieldsToUpdate = new Student(id, "New", "Name");
+        try {
             boolean rowsAffected = studentService.updateStudentById(studentFieldsToUpdate);
             System.out.println(rowsAffected);
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e);
         }
         try {
             studentService.closeAllDatabaseObjects();
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e);
         }
 

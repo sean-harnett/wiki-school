@@ -248,76 +248,48 @@ public class StudentService extends GeneralService {
      * Method used to update a single student record by Id within a database.
      *
      * @param student Object containing the values to update.
-     * @return integer- rows affected, returns -1 when error occurs.
+     * @return boolean, whether the student record was updated or not.
      * @throws SQLException
+     * @throws IllegalStateException thrown when student param is null, or student.getId() returns null.
      */
-    public boolean updateStudentById(Student student) throws SQLException {
+    public boolean updateStudentById(Student student) throws SQLException, IllegalStateException {
 
+        if (student == null) {
+            throw new IllegalStateException("Error in method 'updateStudentById: 'student' parameter cannot be null.");
+        }
+        if (student.getId() == null) {
+            throw new IllegalStateException("Error in method 'updateStudentById: 'student.getId()' cannot return null.");
+        }
+
+        int rowsAffected;
 
         String nonformattedQuery = "UPDATE student SET - WHERE id=?";
-        int rowsAffected = 0;
         this.resetQueryAttributes();
         this.queryInformation.setUnFormattedSqlStatement(nonformattedQuery);
 
         String[] formatAttributes = new String[1];
         UUID targetId = student.getId();
-        String firstName = student.getFirstName();
-        String lastName = student.getLastName();
 
-        Object[] queryValues = null;
-        int[] columnIndices = null;
+        Object[] fields = {student.getFirstName(), student.getLastName()};
 
-
-        int size = 1;
+        String[] potentialQueryFields = {"first_name=?","last_name=?"};
         Object[] potentialValues = new Object[3];
         int[] potentialIndices = new int[3];
-        potentialValues[2] = targetId;
 
         StringBuilder queryBuilder = new StringBuilder();
 
-        if (firstName != null) {
-            queryBuilder.append("first_name=?");
-            potentialValues[0] = firstName;
-            potentialIndices[0] = 1;
-            size++;
+        int size = this.createQueryIndexAttributes(fields, targetId, potentialIndices, potentialValues, queryBuilder, potentialQueryFields);
+
+        if(size == -1){
+            throw new IllegalStateException("Error: no fields were provided to method: updateStudentById");
         }
 
-        if (lastName != null) {
-            if (size > 0) {
-                queryBuilder.append(",last_name=?");
-                potentialIndices[1] = 2;
-                potentialIndices[2] = 3;
-            } else {
-                queryBuilder.append("last_name=?");
-                potentialIndices[0] = 1;
-                potentialIndices[1] = 2;
-            }
-
-            potentialValues[1] = lastName;
-            size++;
-        }
-
-        queryValues = new Object[size];
-        columnIndices = new int[size];
-
-        for (int ix = 0; ix < potentialValues.length; ix++) {
-
-            if (potentialValues[ix] != null) {
-                queryValues[ix] = potentialValues[ix];
-                columnIndices[ix] = potentialIndices[ix];
-            }
-            if (potentialIndices[ix] > 0) {
-                columnIndices[ix] = potentialIndices[ix];
-            }
-        }
         formatAttributes[0] = queryBuilder.toString();
         this.constructStatement(nonformattedQuery, formatAttributes);
 
-        if (queryValues == null || columnIndices == null) { // is error return -1.
-            return rowsAffected > 0;
-        }
-        this.queryInformation.setRecordAttributes(queryValues);
-        this.queryInformation.setAttributeSqlColumnIndices(columnIndices);
+        this.queryInformation.setRecordAttributes(potentialValues);
+        this.queryInformation.setAttributeSqlColumnIndices(potentialIndices);
+
         try {
             rowsAffected = this.executeUpdate();
         } catch (SQLException e) {
@@ -328,9 +300,9 @@ public class StudentService extends GeneralService {
         } catch (SQLException e) {
             throw e;
         }
+
         this.resetQueryAttributes();
-        if (rowsAffected > 0)
-            this.studentCache.putIntoCache(targetId, student);
+
         return rowsAffected > 0;
 
     }
