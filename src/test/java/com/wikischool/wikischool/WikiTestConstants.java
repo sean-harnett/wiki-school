@@ -33,6 +33,6 @@ public abstract class WikiTestConstants {
     //Student:
     static final public String ID_FIELD = "id";
     static final public String STUDENT_COLUMN_FIRST_NAME = "first_name";
-    static final public String TEST_STUDENT_ID = "108c406a-a072-4fce-a93c-61ee2e1aa5ca";
+    static final public String TEST_STUDENT_ID = "45013d08-f486-46fc-b633-89b4b069849d";
 
 }

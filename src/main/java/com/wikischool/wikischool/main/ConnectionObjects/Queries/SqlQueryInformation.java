@@ -1,4 +1,4 @@
-package com.wikischool.wikischool.main.Queries;
+package com.wikischool.wikischool.main.ConnectionObjects.Queries;
 
 /**
  * Class to store values for an SQL query.

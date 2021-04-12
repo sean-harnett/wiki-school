@@ -1,6 +1,4 @@
-package com.wikischool.wikischool.main.Models.Interfaces;
-
-import com.wikischool.wikischool.main.Queries.SqlQueryInformation;
+package com.wikischool.wikischool.main.ConnectionObjects.Queries;
 
 import java.sql.SQLException;
 

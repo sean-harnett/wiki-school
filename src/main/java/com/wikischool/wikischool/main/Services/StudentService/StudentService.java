@@ -1,11 +1,10 @@
 package com.wikischool.wikischool.main.Services.StudentService;
 
 import com.wikischool.wikischool.main.Models.People.Student;
-import com.wikischool.wikischool.main.Queries.SqlQueryExecutor;
-import com.wikischool.wikischool.main.Queries.SqlQueryInformation;
-import com.wikischool.wikischool.main.Services.GeneralService;
+import com.wikischool.wikischool.main.ConnectionObjects.Queries.SqlQueryExecutor;
+import com.wikischool.wikischool.main.ConnectionObjects.Queries.SqlQueryInformation;
+import com.wikischool.wikischool.main.Services.ServiceAbstraction.GeneralService;
 import com.wikischool.wikischool.main.utilities.Constants.SizeConstants;
-import com.wikischool.wikischool.main.utilities.DataStructures.LRUCache.LRUCache;
 import com.wikischool.wikischool.main.utilities.StringFormatting.StringFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ import java.util.UUID;
 @Service
 public class StudentService extends GeneralService {
 
-    private final LRUCache<UUID, Student> studentCache = new LRUCache<>(SizeConstants.DEFAULT_CACHE_LENGTH);
+
 
     @Autowired
     public StudentService(StringFormatter stringFormatter, SqlQueryExecutor executor) {
@@ -46,11 +45,9 @@ public class StudentService extends GeneralService {
      * @param lastName  Students last name
      * @return a new Student object populated with first name, last name, and an auto-generated ID field
      */
-    public Student createStudent(String firstName, String lastName, UUID id) {
-        if (id == null)
-            return null;
-        Student student = new Student(id, firstName, lastName);
-        this.studentCache.putIntoCache(id, student);
+    public Student createStudent(String firstName, String lastName) {
+
+        Student student = new Student(firstName, lastName);
         return student;
     }
 
@@ -62,21 +59,20 @@ public class StudentService extends GeneralService {
      */
     public void insertStudentIntoDatabase(Student student) throws SQLException {
 
-        String nonformattedQuery = "INSERT INTO student (-,-,-) VALUES (?,?,?)";
+        String nonformattedQuery = "INSERT INTO student (-,-) VALUES (?,?)";
 
-        UUID id = student.getId();
         String firstName = student.getFirstName();
         String lastName = student.getLastName();
 
-        String[] formatAttributes = {"id", "first_name", "last_name"};
+        String[] formatAttributes = {"first_name", "last_name"};
 
         this.queryInformation.setUnFormattedSqlStatement(nonformattedQuery);
 
         this.constructStatement(nonformattedQuery, formatAttributes);
 
-        Object[] queryValues = {id, firstName, lastName};
+        Object[] queryValues = {firstName, lastName};
 
-        int[] columnIndices = {1, 2, 3};
+        int[] columnIndices = {1, 2};
 
         queryInformation.setRecordAttributes(queryValues);
         queryInformation.setAttributeSqlColumnIndices(columnIndices);
@@ -93,9 +89,8 @@ public class StudentService extends GeneralService {
         } catch (SQLException e) {
             throw e;
         }
-        this.resetQueryAttributes();
 
-        this.studentCache.putIntoCache(id, student);
+        this.resetQueryAttributes();
 
     }
 
@@ -109,50 +104,43 @@ public class StudentService extends GeneralService {
     public Student selectStudentByIdFromDatabase(UUID targetStudentId) throws SQLException {
         Student foundStudent = null;
 
-        if (this.studentCache.checkIfCacheContainsKey(targetStudentId)) {
-            foundStudent = this.studentCache.getFromCache(targetStudentId);
-        } else {
-            //Create the query:
-            String nonformattedQuery = "SELECT - FROM student WHERE -";
-            String[] formatAttributes = {"*", "id=?"};
-            this.constructStatement(nonformattedQuery, formatAttributes);
+        //Create the query:
+        String nonformattedQuery = "SELECT - FROM student WHERE -";
+        String[] formatAttributes = {"first_name,last_name", "id=?"};
 
-            Object[] queryValues = {targetStudentId};
-            int[] columnIndices = {1};
+        this.constructStatement(nonformattedQuery, formatAttributes);
 
-            this.queryInformation.setRecordAttributes(queryValues);
-            this.queryInformation.setAttributeSqlColumnIndices(columnIndices);
+        Object[] queryValues = {targetStudentId};
+        int[] columnIndices = {1};
 
-            //Execute the query:
+        this.queryInformation.setRecordAttributes(queryValues);
+        this.queryInformation.setAttributeSqlColumnIndices(columnIndices);
 
-            try {
-                this.executeQuery();
-            } catch (SQLException e) {
-                throw e;
-            }
-            ResultSet rs = this.getResultSet();
+        //Execute the query:
 
-
-            // If the result set retrieved anything, set the columns to corresponding student class members:
-            if (rs.getFetchSize() > 0) {
-
-                UUID id = rs.getObject(1, UUID.class);
-                String firstName = rs.getString(2);
-                String lastName = rs.getString(3);
-
-                foundStudent = new Student(id, firstName, lastName);
-
-                // Add the student to cache.
-                this.studentCache.putIntoCache(id, foundStudent);
-
-            }
-            try {
-                this.closeAllDatabaseObjects(); // throws SQLException
-            } catch (SQLException e) {
-                throw e;
-            }
-            this.resetQueryAttributes(); // reset the queryInformation object
+        try {
+            this.executeQuery();
+        } catch (SQLException e) {
+            throw e;
         }
+        ResultSet rs = this.getResultSet();
+
+
+        // If the result set retrieved anything, set the columns to corresponding student class members:
+        if (rs.getFetchSize() > 0) {
+
+            String firstName = rs.getString(1);
+            String lastName = rs.getString(2);
+
+            foundStudent = new Student(targetStudentId, firstName, lastName);
+
+        }
+        try {
+            this.closeAllDatabaseObjects(); // throws SQLException
+        } catch (SQLException e) {
+            throw e;
+        }
+        this.resetQueryAttributes(); // reset the queryInformation object
 
         return foundStudent;
 
@@ -164,10 +152,10 @@ public class StudentService extends GeneralService {
      * @param targetStudentId the id to find, and delete it's record.
      * @throws SQLException
      */
-    public boolean deleteStudentByIdFromDataBase(UUID targetStudentId) throws SQLException {
-        if (targetStudentId == null) {
-            return false;
-        }
+    public boolean deleteStudentByIdFromDataBase(UUID targetStudentId) throws SQLException, IllegalArgumentException {
+
+       checkNullArgument(targetStudentId,"'targetStudentId' cannot be null in method: 'deleteStudentByIdFromDataBase");
+
 
         String query = "DELETE FROM student WHERE id=?";
 
@@ -186,11 +174,6 @@ public class StudentService extends GeneralService {
         try {
 
             rowsAffected = this.executeUpdate();
-
-            if (studentCache.checkIfCacheContainsKey(targetStudentId)) {
-                studentCache.removeFromCache(targetStudentId);
-            }
-
 
         } catch (SQLException e) {
             throw e;
@@ -214,7 +197,7 @@ public class StudentService extends GeneralService {
      */
     public List<Student> retrieveAllStudents() throws SQLException {
 
-        String query = "SELECT * FROM student"; // no need to format
+        String query = "SELECT id,first_name,last_name FROM student"; // no need to format
 
         this.queryInformation.setUnFormattedSqlStatement(query);
 
@@ -272,7 +255,7 @@ public class StudentService extends GeneralService {
 
         Object[] fields = {student.getFirstName(), student.getLastName()};
 
-        String[] potentialQueryFields = {"first_name=?","last_name=?"};
+        String[] potentialQueryFields = {"first_name=?", "last_name=?"};
         Object[] potentialValues = new Object[3];
         int[] potentialIndices = new int[3];
 
@@ -280,7 +263,7 @@ public class StudentService extends GeneralService {
 
         int size = this.createQueryIndexAttributes(fields, targetId, potentialIndices, potentialValues, queryBuilder, potentialQueryFields);
 
-        if(size == -1){
+        if (size == -1) {
             throw new IllegalStateException("Error: no fields were provided to method: updateStudentById");
         }
 

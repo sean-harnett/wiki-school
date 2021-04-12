@@ -1,9 +1,8 @@
-package com.wikischool.wikischool.main.Services;
+package com.wikischool.wikischool.main.Services.ServiceAbstraction;
 
-import com.wikischool.wikischool.main.Queries.QueryFormatter;
-import com.wikischool.wikischool.main.Queries.SqlQueryExecutor;
-import com.wikischool.wikischool.main.Queries.SqlQueryInformation;
-import com.wikischool.wikischool.main.Services.ServiceAbstraction.TableAttributes;
+import com.wikischool.wikischool.main.ConnectionObjects.Queries.QueryFormatter;
+import com.wikischool.wikischool.main.ConnectionObjects.Queries.SqlQueryExecutor;
+import com.wikischool.wikischool.main.ConnectionObjects.Queries.SqlQueryInformation;
 import com.wikischool.wikischool.main.utilities.StringFormatting.StatementFormatter;
 
 import java.sql.ResultSet;
@@ -12,15 +11,15 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 /**
  * Class used to handle a database queries made by services.
  *
  * @author sean-harnett
- * @see TableAttributes
  * @see SqlQueryExecutor
  * @see QueryFormatter
  * @see SqlQueryInformation
- * TODO: setup the QueryFormatter to be autowired.
  */
 public abstract class GeneralService {
 
@@ -90,7 +89,7 @@ public abstract class GeneralService {
      * Also sets these values to corresponding arrays as parameters: potentialIndices, and potentialValues.
      *
      * @param potentialFields  fields to check for values of.
-     * @param primaryKey       the primary key for the record.*
+     * @param primaryKey       the primary key for the record.
      * @param potentialIndices where to store the corresponding column indices when found.
      * @param potentialValues  where to store the new column values to update with when found.
      * @param queryBuilder     the string builder used to concatenate the proper amount of fields of the form "id=?".
@@ -145,4 +144,16 @@ public abstract class GeneralService {
         return -1; // no fields were found.
     }
 
+    protected void setExecutionParameters(String query, Object[] attributes, int[] indices) {
+        this.resetQueryAttributes();
+        this.queryInformation.setUnFormattedSqlStatement(query);
+        this.queryInformation.setRecordAttributes(attributes);
+        this.queryInformation.setAttributeSqlColumnIndices(indices);
+    }
+
+    protected void checkNullArgument(Object obj, String msg) throws IllegalArgumentException {
+        if (isNull(obj)) {
+            throw new IllegalArgumentException(msg);
+        }
+    }
 }

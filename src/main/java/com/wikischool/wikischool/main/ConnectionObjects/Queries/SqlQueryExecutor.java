@@ -1,7 +1,6 @@
-package com.wikischool.wikischool.main.Queries;
+package com.wikischool.wikischool.main.ConnectionObjects.Queries;
 
 import com.wikischool.wikischool.main.ConnectionObjects.ConnectionAbstraction.DatabaseConnection;
-import com.wikischool.wikischool.main.Models.Interfaces.QueryArchetype;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -25,7 +25,7 @@ public class StudentTests {
     @Test
     public void TestStudentInsert(@Autowired StudentService studentService) {
 
-        Student student = studentService.createStudent("Test", "Name", UUID.fromString(WikiTestConstants.TEST_STUDENT_ID));
+        Student student = studentService.createStudent("Test", "Name");
         try {
             studentService.insertStudentIntoDatabase(student);
         } catch (SQLException e) {

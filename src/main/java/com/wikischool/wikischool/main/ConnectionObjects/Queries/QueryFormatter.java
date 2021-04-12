@@ -1,4 +1,4 @@
-package com.wikischool.wikischool.main.Queries;
+package com.wikischool.wikischool.main.ConnectionObjects.Queries;
 
 import com.wikischool.wikischool.main.utilities.StringFormatting.StatementFormatter;
 

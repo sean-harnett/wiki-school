@@ -1,9 +1,7 @@
 package com.wikischool.wikischool.main.Models.People;
 
 import com.wikischool.wikischool.main.Models.Types.Course;
-import com.wikischool.wikischool.main.utilities.Constants.SizeConstants;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,15 +30,11 @@ public class Student  {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.courses = new ArrayList<>(SizeConstants.DEFAULT_LIST_LENGTH);
+        this.courses = null;
     }
-
-    /**
-     * Minimal constructor instantiating a student with only an ID.
-     * @param id UUID for student
-     */
-    public Student(UUID id){
-        this.id = id;
+    public Student(String firstName, String lastName){
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     /**
